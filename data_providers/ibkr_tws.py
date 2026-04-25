@@ -7,12 +7,17 @@ from time import sleep
 
 import pandas as pd
 
-# Streamlit runs app code inside a ScriptRunner thread. ib_insync imports
-# eventkit, which expects that thread to already have an asyncio event loop.
-try:
-    asyncio.get_event_loop()
-except RuntimeError:
-    asyncio.set_event_loop(asyncio.new_event_loop())
+def ensure_event_loop() -> None:
+    """Create an asyncio event loop for Streamlit worker threads if needed."""
+    try:
+        asyncio.get_event_loop()
+    except RuntimeError:
+        asyncio.set_event_loop(asyncio.new_event_loop())
+
+
+# Streamlit runs app code inside ScriptRunner threads. ib_insync imports
+# eventkit, which expects the current thread to already have an event loop.
+ensure_event_loop()
 
 from ib_insync import IB, Stock, util
 
@@ -36,6 +41,7 @@ class IBKRConnectionConfig:
 
 
 def connect_ibkr(config: IBKRConnectionConfig) -> IB:
+    ensure_event_loop()
     ib = IB()
     ib.connect(config.host, config.port, clientId=config.client_id, readonly=config.readonly, timeout=8)
     return ib
