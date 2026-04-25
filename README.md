@@ -69,7 +69,17 @@ The dashboard backtest is stricter than the original demo flow:
 streamlit run dashboard.py
 ```
 
-The dashboard is organized as a dark fintech-style research cockpit. It lets you initialize the database, run an autonomous research pipeline, manage universes, fetch data, run the scanner, adjust key thresholds, run a backtest, inspect trades, and simulate the 15-minute monitor. The controls are local only and do not enable live or paper trading.
+The dashboard is organized as a dark fintech-style research cockpit with sidebar navigation:
+
+- **Command Center**: system status and workflow overview
+- **Autopilot**: one-click discovery, data refresh, scan, and backtest
+- **Data Hub**: IBKR and Alpha Vantage data tools
+- **Research**: scanner and backtest workbench
+- **Universe**: saved symbol sets
+- **Risk Monitor**: 15-minute simulation
+- **Admin**: local database setup
+
+The controls are local only and do not enable live or paper trading.
 
 ## Autopilot
 

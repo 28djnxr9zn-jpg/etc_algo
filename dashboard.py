@@ -258,6 +258,14 @@ def inject_design() -> None:
             color: var(--otc-text);
         }
 
+        div[role="radiogroup"] label {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+        }
+
         .stButton > button {
             border-radius: 12px;
             border: 1px solid var(--otc-line);
@@ -271,6 +279,36 @@ def inject_design() -> None:
             background: linear-gradient(135deg, var(--otc-blue), var(--otc-green));
             color: #061014;
             border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .otc-page-head {
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--otc-line);
+        }
+
+        .otc-page-kicker {
+            color: var(--otc-blue);
+            font-size: 12px;
+            font-weight: 760;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            margin-bottom: 8px;
+        }
+
+        .otc-page-title {
+            color: var(--otc-text);
+            font-size: 36px;
+            font-weight: 720;
+            line-height: 1.08;
+        }
+
+        .otc-page-body {
+            color: var(--otc-muted);
+            font-size: 16px;
+            line-height: 1.45;
+            max-width: 820px;
+            margin-top: 8px;
         }
 
         .stDataFrame, div[data-testid="stTable"] {
@@ -337,6 +375,19 @@ def render_section(title: str, body: str) -> None:
         <div class="otc-section">
             <h2>{title}</h2>
             <p>{body}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_page_header(kicker: str, title: str, body: str) -> None:
+    st.markdown(
+        f"""
+        <div class="otc-page-head">
+            <div class="otc-page-kicker">{kicker}</div>
+            <div class="otc-page-title">{title}</div>
+            <div class="otc-page-body">{body}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -473,10 +524,12 @@ def choose_universe(label: str, key_prefix: str, default_manual: str = "AAPL,MSF
 
 def settings_from_sidebar() -> dict:
     settings = load_settings()
-    st.sidebar.title("Strategy Controls")
-    st.sidebar.caption("Tune the scanner and backtest assumptions.")
+    st.sidebar.title("OTC Algo")
+    st.sidebar.caption("Autonomous research cockpit")
 
-    st.sidebar.subheader("Entry")
+    st.sidebar.divider()
+    st.sidebar.subheader("Strategy")
+    st.sidebar.caption("Entry")
     settings["entry"]["min_price"] = st.sidebar.number_input(
         "Minimum entry price",
         min_value=0.0001,
@@ -494,7 +547,7 @@ def settings_from_sidebar() -> dict:
         format="%.4f",
     )
 
-    st.sidebar.subheader("Watchlist")
+    st.sidebar.caption("Watchlist")
     settings["watchlist"]["min_avg_volume_20d"] = st.sidebar.number_input(
         "Min 20-day avg volume",
         min_value=0,
@@ -508,7 +561,7 @@ def settings_from_sidebar() -> dict:
         step=100,
     )
 
-    st.sidebar.subheader("Tradable")
+    st.sidebar.caption("Tradable")
     settings["tradable"]["min_volume_breakout_multiple"] = st.sidebar.slider(
         "Min volume breakout multiple",
         min_value=1.0,
@@ -535,7 +588,7 @@ def settings_from_sidebar() -> dict:
         step=1,
     )
 
-    st.sidebar.subheader("Sizing")
+    st.sidebar.caption("Sizing")
     settings["portfolio"]["starting_cash"] = st.sidebar.number_input(
         "Starting cash",
         min_value=100,
@@ -556,7 +609,7 @@ def settings_from_sidebar() -> dict:
         step=1,
     ) / 100
 
-    st.sidebar.subheader("Risk Exits")
+    st.sidebar.caption("Risk exits")
     settings["risk_exits"]["massive_drop_from_intraday_high_pct"] = st.sidebar.slider(
         "Exit drop from high %",
         min_value=5,
@@ -577,7 +630,7 @@ def settings_from_sidebar() -> dict:
         help="Leave this off for the intended hold-winners behavior.",
     )
 
-    st.sidebar.subheader("Safety")
+    st.sidebar.caption("Safety")
     settings["portfolio"]["global_stop_trading"] = st.sidebar.checkbox(
         "Global stop trading",
         value=bool(settings["portfolio"]["global_stop_trading"]),
@@ -607,9 +660,10 @@ def render_database_controls() -> None:
 
 
 def render_overview(settings: dict) -> None:
-    render_section(
-        "Control Center",
-        "Run the workflow from left to right: discover a universe, refresh data, scan candidates, then backtest the strategy.",
+    render_page_header(
+        "Command Center",
+        "Research pipeline at a glance.",
+        "Start with Autopilot for an automated run, or step into Data Hub and Research when you need manual control.",
     )
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -622,24 +676,35 @@ def render_overview(settings: dict) -> None:
         st.metric("Paper orders", "Off")
 
     st.write("")
-    step1, step2, step3, step4 = st.columns(4)
-    with step1:
-        render_card("1. Discover", "Use IBKR scanner discovery or a saved CSV to build the universe.")
-    with step2:
-        render_card("2. Refresh", "Pull historical bars through TWS or Gateway in read-only mode.")
-    with step3:
-        render_card("3. Scan", "Apply price, liquidity, catalyst, spread, and risk filters.")
-    with step4:
-        render_card("4. Backtest", "Simulate next-day entries, partial fills, and risk exits.")
+    c1, c2 = st.columns([1.2, 0.8])
+    with c1:
+        render_card(
+            "Autopilot is the primary workflow",
+            "It discovers a universe through IBKR, saves it, refreshes bars, scans the database, and runs a backtest without placing orders.",
+        )
+    with c2:
+        render_card(
+            "System boundary",
+            "Live trading and paper order placement are hard-disabled. This is research, simulation, and monitoring only.",
+        )
 
     st.write("")
-    render_database_controls()
+    s1, s2, s3, s4 = st.columns(4)
+    with s1:
+        render_card("Discover", "IBKR scanner finds candidates.")
+    with s2:
+        render_card("Refresh", "TWS/Gateway provides bars.")
+    with s3:
+        render_card("Rank", "Scanner scores tradability.")
+    with s4:
+        render_card("Simulate", "Backtest models fills and exits.")
 
 
 def render_autopilot(settings: dict) -> None:
-    render_section(
+    render_page_header(
         "Autopilot",
-        "Run the full read-only research loop: discover a universe from IBKR, fetch bars, scan, and backtest. No orders are placed.",
+        "Run the full research loop.",
+        "Discover a universe from IBKR, fetch historical bars, scan, and backtest in one read-only operation.",
     )
     st.warning("Autopilot is research-only. Live trading and paper order placement remain disabled.")
 
@@ -731,7 +796,7 @@ def render_autopilot(settings: dict) -> None:
 
 
 def render_universe() -> None:
-    render_section("Universe", "Save, review, or replace ticker universes used by IBKR fetching and strategy tests.")
+    render_page_header("Universe", "Manage saved symbol sets.", "Review discovered universes or import your own CSV when you want a controlled watch universe.")
 
     names = saved_universe_names()
     if names:
@@ -768,8 +833,9 @@ def render_universe() -> None:
 
 
 def render_live_data(settings: dict) -> None:
-    render_section(
-        "Alpha Vantage Fallback",
+    render_page_header(
+        "Fallback Data",
+        "Alpha Vantage price import.",
         "Fetch real OHLCV price history when IBKR is not available. This does not include OTC metadata, catalysts, or Level 2 depth.",
     )
     api_key = st.text_input("Alpha Vantage API key", type="password")
@@ -812,7 +878,7 @@ def render_live_data(settings: dict) -> None:
 
 
 def render_ibkr_data(settings: dict) -> None:
-    render_section("IBKR Data", "Connect through TWS or IB Gateway in read-only mode. This dashboard does not place orders.")
+    render_page_header("IBKR", "Primary market data bridge.", "Connect through TWS or IB Gateway in read-only mode. This dashboard does not place orders.")
 
     col1, col2, col3 = st.columns(3)
     host = col1.text_input("Host", value="127.0.0.1")
@@ -952,7 +1018,7 @@ def scanner_frame(settings: dict) -> pd.DataFrame:
 
 
 def render_scanner(settings: dict) -> None:
-    render_section("Scanner", "Rank the currently loaded database symbols using the strategy filters and scoring model.")
+    render_page_header("Scanner", "Inspect current candidates.", "Rank the currently loaded database symbols using the strategy filters and scoring model.")
     try:
         scan = scanner_frame(settings)
     except Exception as exc:
@@ -976,7 +1042,7 @@ def render_scanner(settings: dict) -> None:
 
 
 def render_backtest(settings: dict) -> None:
-    render_section("Backtest", "Signals are generated after the close. Entries are simulated on the next available trading day.")
+    render_page_header("Backtest", "Test the strategy honestly.", "Signals are generated after the close. Entries are simulated on the next available trading day.")
     st.info(
         "For IBKR price-only data, catalyst and OTC risk fields are neutral placeholders unless you load a richer dataset. "
         "For a price-only test, turn off 'Require catalyst for tradable candidates' in the Live Data tab or loosen the sidebar thresholds."
@@ -1024,7 +1090,7 @@ def render_backtest(settings: dict) -> None:
 
 
 def render_monitor(settings: dict) -> None:
-    render_section("Monitor", "Simulate a 15-minute risk check. The monitor only recommends actions.")
+    render_page_header("Monitor", "Risk watch simulation.", "Simulate a 15-minute risk check. The monitor only recommends actions.")
     try:
         scan = scanner_frame(settings)
     except Exception as exc:
@@ -1048,32 +1114,54 @@ def render_monitor(settings: dict) -> None:
     st.dataframe(pd.DataFrame(alerts), use_container_width=True, hide_index=True)
 
 
+def render_data_hub(settings: dict) -> None:
+    provider = st.radio("Data source", ["IBKR", "Alpha Vantage"], horizontal=True)
+    st.write("")
+    if provider == "IBKR":
+        render_ibkr_data(settings)
+    else:
+        render_live_data(settings)
+
+
+def render_research(settings: dict) -> None:
+    mode = st.radio("Research view", ["Scanner", "Backtest"], horizontal=True)
+    st.write("")
+    if mode == "Scanner":
+        render_scanner(settings)
+    else:
+        render_backtest(settings)
+
+
+def render_admin() -> None:
+    render_page_header("Admin", "Local project controls.", "Initialize the database, load demo data, and confirm local state.")
+    render_database_controls()
+
+
 def main() -> None:
     inject_design()
     settings = settings_from_sidebar()
-    render_hero(settings)
-
-    tab_overview, tab_autopilot, tab_universe, tab_data, tab_scan, tab_backtest, tab_monitor = st.tabs(
-        ["Overview", "Autopilot", "Universe", "Data", "Scanner", "Backtest", "Monitor"]
+    st.sidebar.divider()
+    page = st.sidebar.radio(
+        "Navigate",
+        ["Command Center", "Autopilot", "Data Hub", "Research", "Universe", "Risk Monitor", "Admin"],
+        index=0,
     )
-    with tab_overview:
+
+    if page == "Command Center":
+        render_hero(settings)
         render_overview(settings)
-    with tab_autopilot:
+    elif page == "Autopilot":
         render_autopilot(settings)
-    with tab_universe:
+    elif page == "Data Hub":
+        render_data_hub(settings)
+    elif page == "Research":
+        render_research(settings)
+    elif page == "Universe":
         render_universe()
-    with tab_data:
-        ibkr_tab, fallback_tab = st.tabs(["IBKR", "Alpha Vantage"])
-        with ibkr_tab:
-            render_ibkr_data(settings)
-        with fallback_tab:
-            render_live_data(settings)
-    with tab_scan:
-        render_scanner(settings)
-    with tab_backtest:
-        render_backtest(settings)
-    with tab_monitor:
+    elif page == "Risk Monitor":
         render_monitor(settings)
+    elif page == "Admin":
+        render_admin()
 
 
 if __name__ == "__main__":
