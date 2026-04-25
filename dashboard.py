@@ -63,6 +63,19 @@ def parse_tickers_text(text: str) -> list[str]:
     return normalize_symbols(text)
 
 
+def choose_universe(label: str, key_prefix: str, default_manual: str = "AAPL,MSFT") -> tuple[str, list[str]]:
+    names = saved_universe_names()
+    choice = st.selectbox(label, ["Manual tickers"] + names, key=f"{key_prefix}_universe")
+    if choice == "Manual tickers":
+        manual_symbols = st.text_area("Manual tickers", value=default_manual, key=f"{key_prefix}_manual")
+        symbols = normalize_symbols(manual_symbols)
+    else:
+        symbols = get_universe_tickers(choice, DB_PATH)
+        st.dataframe(pd.DataFrame({"ticker": symbols}), use_container_width=True, hide_index=True)
+    st.caption(f"Selected {len(symbols)} tickers.")
+    return choice, symbols
+
+
 def settings_from_sidebar() -> dict:
     settings = load_settings()
     st.sidebar.header("Controls")
@@ -293,11 +306,6 @@ def render_ibkr_data(settings: dict) -> None:
     primary_exchange = col5.text_input("Primary exchange", value="", help="Optional. OTC/PINK symbols may need provider-specific mapping.")
     currency = col6.text_input("Currency", value="USD")
 
-    names = saved_universe_names()
-    universe_choice = st.selectbox("Universe", ["Manual tickers"] + names)
-    manual_symbols = st.text_area("Manual tickers", value="AAPL,MSFT", disabled=universe_choice != "Manual tickers")
-    symbols = normalize_symbols(manual_symbols) if universe_choice == "Manual tickers" else get_universe_tickers(universe_choice, DB_PATH)
-    st.caption(f"Selected {len(symbols)} tickers.")
     market_data_type = st.selectbox("Market data type", ["Live", "Delayed", "Frozen", "Delayed frozen"], index=1)
     duration = st.selectbox("Historical duration", ["30 D", "60 D", "6 M", "1 Y"], index=1)
     what_to_show = st.selectbox("Historical data type", ["TRADES", "MIDPOINT", "BID", "ASK"], index=0)
@@ -358,6 +366,7 @@ def render_ibkr_data(settings: dict) -> None:
                 st.warning("\n".join(errors))
 
     with bars_tab:
+        _, symbols = choose_universe("Universe to fetch historical bars for", "bars")
         if st.button("Fetch IBKR historical bars into database", type="primary"):
             if not symbols:
                 st.error("Add at least one ticker.")
@@ -388,7 +397,10 @@ def render_ibkr_data(settings: dict) -> None:
 
     with depth_tab:
         st.write("Request an IBKR market-depth snapshot with `reqMktDepth`.")
-        depth_symbol = st.text_input("Depth test ticker", value=symbols[0] if symbols else "AAPL")
+        depth_symbols = saved_universe_names()
+        depth_universe = st.selectbox("Optional source universe", ["Manual ticker"] + depth_symbols, key="depth_universe")
+        universe_symbols = get_universe_tickers(depth_universe, DB_PATH) if depth_universe != "Manual ticker" else []
+        depth_symbol = st.text_input("Depth test ticker", value=universe_symbols[0] if universe_symbols else "AAPL")
         depth_rows = st.slider("Depth rows", min_value=1, max_value=10, value=5)
         smart_depth = st.checkbox("Smart depth", value=False)
         if st.button("Test IBKR Level 2 snapshot", type="primary"):
