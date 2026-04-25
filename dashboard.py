@@ -8,7 +8,18 @@ import streamlit as st
 from backtests.backtest import run_backtest_detailed
 from data_providers.alpha_vantage import fetch_symbols, normalize_symbols
 from data_providers.ibkr_tws import IBKRConnectionConfig, fetch_historical_daily_prices, fetch_level2_snapshot
-from database.db import DB_PATH, get_connection, init_db, load_sample_data, load_settings, read_table, replace_table_rows
+from database.db import (
+    DB_PATH,
+    get_connection,
+    get_universe_tickers,
+    init_db,
+    list_universes,
+    load_sample_data,
+    load_settings,
+    read_table,
+    replace_table_rows,
+    upsert_universe,
+)
 from monitoring.intraday_monitor import run_monitor_sim
 from scanners.universe import MarketFrames, scan_universe
 from strategies.scoring import calculate_signal_score
@@ -33,6 +44,18 @@ def database_has_data() -> bool:
         return not read_table("prices").empty
     except Exception:
         return False
+
+
+def saved_universe_names() -> list[str]:
+    try:
+        names = list_universes(DB_PATH)
+    except Exception:
+        names = []
+    return names
+
+
+def parse_tickers_text(text: str) -> list[str]:
+    return normalize_symbols(text)
 
 
 def settings_from_sidebar() -> dict:
@@ -169,6 +192,44 @@ def render_database_controls() -> None:
         st.metric("Sample data loaded", "Yes" if database_has_data() else "No")
 
 
+def render_universe() -> None:
+    st.subheader("Universe Selection")
+    st.caption("Create a saved ticker universe once, then use it for IBKR fetching, scanning, and backtesting.")
+
+    names = saved_universe_names()
+    if names:
+        selected = st.selectbox("Saved universes", names)
+        tickers = get_universe_tickers(selected, DB_PATH)
+        st.metric("Tickers", len(tickers))
+        st.dataframe(pd.DataFrame({"ticker": tickers}), use_container_width=True, hide_index=True)
+    else:
+        st.info("No universes saved yet. Create one below or load sample data.")
+
+    st.divider()
+    st.write("Create or replace a universe")
+    universe_name = st.text_input("Universe name", value="my_scan_universe")
+    tickers_text = st.text_area("Tickers", value="AAPL,MSFT,NVDA", help="Comma or newline separated.")
+    uploaded = st.file_uploader("Or upload CSV with a ticker column", type=["csv"])
+    source = st.text_input("Source", value="manual")
+    notes = st.text_input("Notes", value="")
+    if st.button("Save universe", type="primary"):
+        tickers = parse_tickers_text(tickers_text)
+        if uploaded is not None:
+            uploaded_frame = pd.read_csv(uploaded)
+            if "ticker" not in uploaded_frame.columns:
+                st.error("Uploaded CSV must include a ticker column.")
+                return
+            tickers.extend(uploaded_frame["ticker"].dropna().astype(str).tolist())
+        if not universe_name.strip():
+            st.error("Add a universe name.")
+            return
+        if not tickers:
+            st.error("Add at least one ticker.")
+            return
+        upsert_universe(universe_name.strip(), tickers, source=source, notes=notes, db_path=DB_PATH)
+        st.success(f"Saved {len(set(tickers))} tickers to {universe_name}.")
+
+
 def render_live_data(settings: dict) -> None:
     st.subheader("Live / Delayed Price Data")
     st.caption(
@@ -227,7 +288,11 @@ def render_ibkr_data(settings: dict) -> None:
     primary_exchange = col5.text_input("Primary exchange", value="", help="Optional. OTC/PINK symbols may need provider-specific mapping.")
     currency = col6.text_input("Currency", value="USD")
 
-    symbols = normalize_symbols(st.text_area("Tickers", value="AAPL,MSFT"))
+    names = saved_universe_names()
+    universe_choice = st.selectbox("Universe", ["Manual tickers"] + names)
+    manual_symbols = st.text_area("Manual tickers", value="AAPL,MSFT", disabled=universe_choice != "Manual tickers")
+    symbols = normalize_symbols(manual_symbols) if universe_choice == "Manual tickers" else get_universe_tickers(universe_choice, DB_PATH)
+    st.caption(f"Selected {len(symbols)} tickers.")
     market_data_type = st.selectbox("Market data type", ["Live", "Delayed", "Frozen", "Delayed frozen"], index=1)
     duration = st.selectbox("Historical duration", ["30 D", "60 D", "6 M", "1 Y"], index=1)
     what_to_show = st.selectbox("Historical data type", ["TRADES", "MIDPOINT", "BID", "ASK"], index=0)
@@ -412,9 +477,11 @@ def main() -> None:
     safety_cols[1].metric("Paper trading", "Disabled")
     safety_cols[2].metric("Entry range", f"${settings['entry']['min_price']:.4f} - ${settings['entry']['max_price']:.4f}")
 
-    tab_db, tab_live, tab_ibkr, tab_scan, tab_backtest, tab_monitor = st.tabs(["Database", "Live Data", "IBKR", "Scanner", "Backtest", "Monitor"])
+    tab_db, tab_universe, tab_live, tab_ibkr, tab_scan, tab_backtest, tab_monitor = st.tabs(["Database", "Universe", "Live Data", "IBKR", "Scanner", "Backtest", "Monitor"])
     with tab_db:
         render_database_controls()
+    with tab_universe:
+        render_universe()
     with tab_live:
         render_live_data(settings)
     with tab_ibkr:

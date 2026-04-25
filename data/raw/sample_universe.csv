@@ -1,0 +1,7 @@
+universe_name,ticker,source,notes,active
+starter_test,AAPL,sample,large cap connectivity test,1
+starter_test,MSFT,sample,large cap connectivity test,1
+starter_test,NVDA,sample,large cap connectivity test,1
+subpenny_watch,ALFA,sample,fake sample ticker,1
+subpenny_watch,MOON,sample,fake sample ticker,1
+subpenny_watch,WIDE,sample,fake sample ticker,1

@@ -46,6 +46,9 @@ def load_sample_data(db_path: Path | str = DB_PATH) -> None:
         load_csv_table(conn, raw_dir / "sample_metadata.csv", "otc_metadata")
         load_csv_table(conn, raw_dir / "sample_catalysts.csv", "catalysts")
         load_csv_table(conn, raw_dir / "sample_level2.csv", "level2_snapshots")
+        if (raw_dir / "sample_universe.csv").exists():
+            conn.execute("DELETE FROM universe_tickers")
+            load_csv_table(conn, raw_dir / "sample_universe.csv", "universe_tickers")
     logger.info("Loaded sample data into %s", db_path)
 
 
@@ -53,6 +56,46 @@ def replace_table_rows(frame: pd.DataFrame, table: str, db_path: Path | str = DB
     with get_connection(db_path) as conn:
         conn.execute(f"DELETE FROM {table}")
         frame.to_sql(table, conn, if_exists="append", index=False)
+
+
+def upsert_universe(universe_name: str, tickers: list[str], source: str = "manual", notes: str = "", db_path: Path | str = DB_PATH) -> None:
+    init_db(db_path)
+    rows = [
+        {
+            "universe_name": universe_name,
+            "ticker": ticker.strip().upper(),
+            "source": source,
+            "notes": notes,
+            "active": 1,
+        }
+        for ticker in sorted(set(tickers))
+        if ticker.strip()
+    ]
+    with get_connection(db_path) as conn:
+        conn.execute("DELETE FROM universe_tickers WHERE universe_name = ?", (universe_name,))
+        if rows:
+            pd.DataFrame(rows).to_sql("universe_tickers", conn, if_exists="append", index=False)
+
+
+def list_universes(db_path: Path | str = DB_PATH) -> list[str]:
+    init_db(db_path)
+    with get_connection(db_path) as conn:
+        frame = pd.read_sql_query(
+            "SELECT universe_name FROM universe_tickers WHERE active = 1 GROUP BY universe_name ORDER BY universe_name",
+            conn,
+        )
+    return frame["universe_name"].tolist()
+
+
+def get_universe_tickers(universe_name: str, db_path: Path | str = DB_PATH) -> list[str]:
+    init_db(db_path)
+    with get_connection(db_path) as conn:
+        frame = pd.read_sql_query(
+            "SELECT ticker FROM universe_tickers WHERE universe_name = ? AND active = 1 ORDER BY ticker",
+            conn,
+            params=(universe_name,),
+        )
+    return frame["ticker"].tolist()
 
 
 def read_table(table: str, db_path: Path | str = DB_PATH) -> pd.DataFrame:

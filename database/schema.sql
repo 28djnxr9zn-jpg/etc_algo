@@ -95,3 +95,13 @@ CREATE TABLE IF NOT EXISTS positions (
   breakout_day_volume INTEGER NOT NULL,
   current_status TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS universe_tickers (
+  universe_name TEXT NOT NULL,
+  ticker TEXT NOT NULL,
+  source TEXT,
+  notes TEXT,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (universe_name, ticker)
+);

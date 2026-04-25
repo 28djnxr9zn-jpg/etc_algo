@@ -101,6 +101,16 @@ The IBKR tab can:
 
 It cannot place orders. Order placement remains disabled.
 
+## Universe Selection
+
+Use the dashboard **Universe** tab to save ticker universes. You can paste tickers or upload a CSV with a `ticker` column. The **IBKR** tab can then fetch historical bars for the selected saved universe instead of making you type tickers every time.
+
+IBKR also has TWS market scanner APIs through `reqScannerSubscription`, but those scans are not the same as a complete OTC/sub-penny master list. The practical workflow is:
+
+1. Maintain one or more saved universes.
+2. Refresh IBKR historical bars for the selected universe.
+3. Let the local scanner and backtester rank and filter candidates.
+
 ## Run The 15-Minute Monitor Simulation
 
 ```bash
