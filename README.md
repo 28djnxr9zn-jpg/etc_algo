@@ -105,11 +105,14 @@ It cannot place orders. Order placement remains disabled.
 
 Use the dashboard **Universe** tab to save ticker universes. You can paste tickers or upload a CSV with a `ticker` column. The **IBKR** tab can then fetch historical bars for the selected saved universe instead of making you type tickers every time.
 
-IBKR also has TWS market scanner APIs through `reqScannerSubscription`, but those scans are not the same as a complete OTC/sub-penny master list. The practical workflow is:
+The **IBKR / Discover Universe** sub-tab can also auto-create a universe from TWS market scanner results. Choose a scan code, location, price/volume filters, and save name, then click **Discover universe from IBKR scanner**.
 
-1. Maintain one or more saved universes.
-2. Refresh IBKR historical bars for the selected universe.
-3. Let the local scanner and backtester rank and filter candidates.
+IBKR has TWS market scanner APIs through `reqScannerSubscription`, but those scans are not the same as a complete OTC/sub-penny master list. The practical workflow is:
+
+1. Auto-discover a broad universe from an IBKR scanner.
+2. Save the discovered symbols to a local universe.
+3. Refresh IBKR historical bars for the selected universe.
+4. Let the local scanner and backtester rank and filter candidates.
 
 ## Run The 15-Minute Monitor Simulation
 

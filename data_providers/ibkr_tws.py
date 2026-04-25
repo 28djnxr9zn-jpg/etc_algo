@@ -19,7 +19,7 @@ def ensure_event_loop() -> None:
 # eventkit, which expects the current thread to already have an event loop.
 ensure_event_loop()
 
-from ib_insync import IB, Stock, util
+from ib_insync import IB, ScannerSubscription, Stock, util
 
 from monitoring.level2 import enrich_level2_snapshot
 
@@ -129,6 +129,88 @@ def fetch_historical_daily_prices(
 
     prices = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
     return prices, errors
+
+
+def discover_scanner_universe(
+    config: IBKRConnectionConfig,
+    scan_code: str,
+    location_code: str,
+    max_results: int,
+    min_price: float | None,
+    max_price: float | None,
+    min_volume: int | None,
+    stock_type_filter: str,
+) -> tuple[pd.DataFrame, list[str]]:
+    errors: list[str] = []
+    api_errors: list[str] = []
+    try:
+        ib = connect_ibkr(config)
+    except Exception as exc:
+        return pd.DataFrame(), [
+            f"Could not connect to IBKR at {config.host}:{config.port}. "
+            "Open TWS or IB Gateway, log in, enable API socket clients, and confirm the API port. "
+            f"Original error: {exc}"
+        ]
+
+    try:
+        def on_error(req_id, error_code, error_string, contract):
+            symbol_text = getattr(contract, "symbol", "") if contract else ""
+            api_errors.append(f"IBKR API error {error_code} reqId={req_id} {symbol_text}: {error_string}")
+
+        ib.errorEvent += on_error
+        scanner = ScannerSubscription(
+            numberOfRows=int(max_results),
+            instrument="STK",
+            locationCode=location_code,
+            scanCode=scan_code,
+            stockTypeFilter=stock_type_filter,
+        )
+        if min_price is not None:
+            scanner.abovePrice = float(min_price)
+        if max_price is not None:
+            scanner.belowPrice = float(max_price)
+        if min_volume is not None:
+            scanner.aboveVolume = int(min_volume)
+
+        results = ib.reqScannerData(scanner)
+        rows = []
+        for item in results:
+            contract = item.contractDetails.contract
+            rows.append(
+                {
+                    "rank": item.rank,
+                    "ticker": contract.symbol,
+                    "local_symbol": contract.localSymbol,
+                    "con_id": contract.conId,
+                    "exchange": contract.exchange,
+                    "primary_exchange": getattr(contract, "primaryExchange", ""),
+                    "currency": contract.currency,
+                    "scan_code": scan_code,
+                    "location_code": location_code,
+                    "distance": item.distance,
+                    "benchmark": item.benchmark,
+                    "projection": item.projection,
+                    "legs": item.legsStr,
+                }
+            )
+        frame = pd.DataFrame(rows)
+        if frame.empty:
+            errors.append(
+                "IBKR scanner returned no rows. Try a broader location, a different scan code, a higher max price, "
+                "or run a similar scan inside TWS Advanced Market Scanner first. "
+                + (" ".join(api_errors) if api_errors else "No IBKR API error event was emitted.")
+            )
+        return frame, errors
+    except Exception as exc:
+        errors.append(f"IBKR scanner request failed: {exc}")
+        errors.extend(api_errors)
+        return pd.DataFrame(), errors
+    finally:
+        try:
+            ib.errorEvent -= on_error
+        except Exception:
+            pass
+        ib.disconnect()
 
 
 def fetch_level2_snapshot(

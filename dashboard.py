@@ -7,7 +7,12 @@ import streamlit as st
 
 from backtests.backtest import run_backtest_detailed
 from data_providers.alpha_vantage import fetch_symbols, normalize_symbols
-from data_providers.ibkr_tws import IBKRConnectionConfig, fetch_historical_daily_prices, fetch_level2_snapshot
+from data_providers.ibkr_tws import (
+    IBKRConnectionConfig,
+    discover_scanner_universe,
+    fetch_historical_daily_prices,
+    fetch_level2_snapshot,
+)
 from database.db import (
     DB_PATH,
     get_connection,
@@ -304,7 +309,53 @@ def render_ibkr_data(settings: dict) -> None:
         "Paid market-data subscriptions control whether live quotes and Level 2 depth are returned."
     )
 
-    bars_tab, depth_tab = st.tabs(["Historical Bars", "Level 2 Snapshot"])
+    discovery_tab, bars_tab, depth_tab = st.tabs(["Discover Universe", "Historical Bars", "Level 2 Snapshot"])
+
+    with discovery_tab:
+        st.write("Use IBKR/TWS market scanners to discover a candidate universe automatically.")
+        st.caption(
+            "Scanner coverage comes from TWS. For OTC/sub-penny names, start broad, save the results, then let the local scanner enforce price/liquidity rules."
+        )
+        dcol1, dcol2, dcol3 = st.columns(3)
+        scan_code = dcol1.selectbox(
+            "Scan code",
+            ["HOT_BY_VOLUME", "TOP_PERC_GAIN", "MOST_ACTIVE", "TOP_TRADE_COUNT", "HOT_BY_PRICE"],
+            index=0,
+        )
+        location_code = dcol2.text_input("Scanner location", value="STK.US", help="Examples: STK.US, STK.US.MAJOR, STK.US.MINOR. Availability depends on TWS.")
+        max_results = dcol3.number_input("Max results", min_value=1, max_value=200, value=50, step=10)
+
+        fcol1, fcol2, fcol3 = st.columns(3)
+        scanner_min_price = fcol1.number_input("Scanner min price", min_value=0.0, value=0.0001, step=0.0001, format="%.4f")
+        scanner_max_price = fcol2.number_input("Scanner max price", min_value=0.0, value=float(settings["entry"]["max_price"]), step=0.01, format="%.4f")
+        scanner_min_volume = fcol3.number_input("Scanner min volume", min_value=0, value=0, step=10000)
+        stock_type_filter = st.selectbox("Stock type filter", ["", "CORP", "ADR", "ETF", "REIT", "CEF"], index=0)
+        discovered_universe_name = st.text_input("Save discovered universe as", value="ibkr_discovered")
+
+        if st.button("Discover universe from IBKR scanner", type="primary"):
+            with st.spinner("Requesting scanner results from TWS..."):
+                discovered, errors = discover_scanner_universe(
+                    config=config,
+                    scan_code=scan_code,
+                    location_code=location_code,
+                    max_results=int(max_results),
+                    min_price=scanner_min_price if scanner_min_price > 0 else None,
+                    max_price=scanner_max_price if scanner_max_price > 0 else None,
+                    min_volume=int(scanner_min_volume) if scanner_min_volume > 0 else None,
+                    stock_type_filter=stock_type_filter,
+                )
+            if not discovered.empty:
+                upsert_universe(
+                    discovered_universe_name,
+                    discovered["ticker"].dropna().astype(str).tolist(),
+                    source=f"ibkr:{scan_code}:{location_code}",
+                    notes="Auto-discovered through TWS market scanner",
+                    db_path=DB_PATH,
+                )
+                st.success(f"Discovered and saved {discovered['ticker'].nunique()} symbols to {discovered_universe_name}.")
+                st.dataframe(discovered, use_container_width=True, hide_index=True)
+            if errors:
+                st.warning("\n".join(errors))
 
     with bars_tab:
         if st.button("Fetch IBKR historical bars into database", type="primary"):
