@@ -76,6 +76,32 @@ def inject_design() -> None:
             border-right: 1px solid var(--line);
         }
 
+        .top-nav-shell {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--line);
+            background: rgba(8, 8, 8, 0.92);
+            padding: 14px 18px;
+            margin-bottom: 12px;
+        }
+
+        .top-nav-title {
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            font-size: 13px;
+            font-weight: 850;
+        }
+
+        .top-nav-meta {
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            font-size: 11px;
+            font-weight: 760;
+        }
+
         h1, h2, h3, h4 {
             color: var(--text);
             letter-spacing: 0;
@@ -428,10 +454,10 @@ def inject_design() -> None:
 
         div[role="radiogroup"] label {
             border: 1px solid var(--line);
-            border-radius: 12px;
+            border-radius: 0;
             background: rgba(255,255,255,0.04);
-            padding: 8px 10px;
-            margin-bottom: 6px;
+            padding: 9px 12px;
+            margin-bottom: 8px;
         }
 
         .stTabs [data-baseweb="tab-list"] {
@@ -649,17 +675,30 @@ def choose_universe(label: str, key_prefix: str, default_manual: str = "AAPL,MSF
 
 def build_settings() -> tuple[str, dict]:
     settings = load_settings()
-    st.sidebar.title("OTC Algo")
-    st.sidebar.caption("Internal tools")
+    pages = ["Overview", "Pipeline", "Data", "Research", "Universe", "Ops"]
+    if "requested_page" in st.session_state:
+        st.session_state["page_nav"] = st.session_state.pop("requested_page")
     if "page_nav" not in st.session_state:
         st.session_state["page_nav"] = "Overview"
-    page = st.sidebar.radio(
+
+    st.markdown(
+        """
+        <div class="top-nav-shell">
+            <div class="top-nav-title">OTC Algo</div>
+            <div class="top-nav-meta">Internal research dashboard</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    page = st.radio(
         "Navigate",
-        ["Overview", "Pipeline", "Data", "Research", "Universe", "Ops"],
+        pages,
         key="page_nav",
+        horizontal=True,
+        label_visibility="collapsed",
     )
 
-    with st.sidebar.expander("Strategy Settings", expanded=False):
+    with st.expander("Strategy settings", expanded=False):
         st.caption("Entry")
         settings["entry"]["min_price"] = st.number_input(
             "Minimum entry price", min_value=0.0001, max_value=1.0, value=float(settings["entry"]["min_price"]), step=0.0001, format="%.4f"
@@ -846,7 +885,7 @@ def render_command_center(settings: dict) -> None:
     page_header("Primary Workflow", "Run the data pipeline.", "Primary path: IBKR universe discovery, historical bar refresh, signal scan, and backtest.")
     pipeline_strip()
     if st.button("Run Pipeline", type="primary", use_container_width=True):
-        st.session_state["page_nav"] = "Pipeline"
+        st.session_state["requested_page"] = "Pipeline"
         st.rerun()
     editorial_modules()
     module_grid()

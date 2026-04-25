@@ -69,15 +69,15 @@ The dashboard backtest is stricter than the original demo flow:
 streamlit run dashboard.py
 ```
 
-The dashboard is organized as a dark fintech-style research cockpit with sidebar navigation:
+The dashboard is organized as an internal research console with top navigation:
 
-- **Command Center**: system status and workflow overview
+- **Overview**: system status and workflow overview
 - **Pipeline**: IBKR discovery, data refresh, scan, and backtest
 - **Data Hub**: IBKR and Alpha Vantage data tools
 - **Research**: scanner and backtest workbench
 - **Universe**: saved symbol sets
 - **Risk Monitor**: 15-minute simulation
-- **Admin**: local database setup
+- **Ops**: local database setup and monitor simulation
 
 The controls are local only and do not enable live or paper trading.
 
