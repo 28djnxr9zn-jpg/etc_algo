@@ -62,6 +62,7 @@ def fetch_historical_daily_prices(
     currency: str,
     duration: str,
     market_data_type: str,
+    what_to_show: str,
 ) -> tuple[pd.DataFrame, list[str]]:
     errors: list[str] = []
     frames: list[pd.DataFrame] = []
@@ -78,20 +79,29 @@ def fetch_historical_daily_prices(
         for symbol in symbols:
             try:
                 contract = make_stock_contract(symbol, exchange=exchange, currency=currency, primary_exchange=primary_exchange)
-                ib.qualifyContracts(contract)
+                qualified = ib.qualifyContracts(contract)
+                if not qualified:
+                    errors.append(f"{symbol}: contract could not be qualified. Try exchange=SMART and blank primary exchange.")
+                    continue
+                contract = qualified[0]
                 bars = ib.reqHistoricalData(
                     contract,
                     endDateTime="",
                     durationStr=duration,
                     barSizeSetting="1 day",
-                    whatToShow="TRADES",
+                    whatToShow=what_to_show,
                     useRTH=True,
                     formatDate=1,
                     keepUpToDate=False,
                 )
                 frame = util.df(bars)
                 if frame is None or frame.empty:
-                    errors.append(f"{symbol}: no historical bars returned")
+                    errors.append(
+                        f"{symbol}: no historical bars returned for conId={contract.conId}, "
+                        f"exchange={contract.exchange}, primaryExchange={getattr(contract, 'primaryExchange', '')}. "
+                        f"whatToShow={what_to_show}. Check market-data permissions, try Delayed data, "
+                        "try MIDPOINT, or try a longer duration."
+                    )
                     continue
                 frame["ticker"] = symbol.upper()
                 frame["date"] = pd.to_datetime(frame["date"]).dt.strftime("%Y-%m-%d")
@@ -130,7 +140,10 @@ def fetch_level2_snapshot(
     try:
         ib.reqMarketDataType(MARKET_DATA_TYPES[market_data_type])
         contract = make_stock_contract(symbol, exchange=exchange, currency=currency, primary_exchange=primary_exchange)
-        ib.qualifyContracts(contract)
+        qualified = ib.qualifyContracts(contract)
+        if not qualified:
+            return None, [f"{symbol}: contract could not be qualified. Try exchange=SMART and blank primary exchange."]
+        contract = qualified[0]
         ticker = ib.reqMktDepth(contract, numRows=rows, isSmartDepth=smart_depth)
         sleep(4)
         ib.cancelMktDepth(contract, isSmartDepth=smart_depth)

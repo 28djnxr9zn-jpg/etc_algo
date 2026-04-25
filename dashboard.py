@@ -225,6 +225,7 @@ def render_ibkr_data(settings: dict) -> None:
     symbols = normalize_symbols(st.text_area("Tickers", value="AAPL,MSFT"))
     market_data_type = st.selectbox("Market data type", ["Live", "Delayed", "Frozen", "Delayed frozen"], index=1)
     duration = st.selectbox("Historical duration", ["30 D", "60 D", "6 M", "1 Y"], index=1)
+    what_to_show = st.selectbox("Historical data type", ["TRADES", "MIDPOINT", "BID", "ASK"], index=0)
     config = IBKRConnectionConfig(host=host, port=int(port), client_id=int(client_id), readonly=True)
 
     st.info(
@@ -245,6 +246,7 @@ def render_ibkr_data(settings: dict) -> None:
                 currency=currency,
                 duration=duration,
                 market_data_type=market_data_type,
+                what_to_show=what_to_show,
             )
         if not prices.empty:
             init_db(DB_PATH)
