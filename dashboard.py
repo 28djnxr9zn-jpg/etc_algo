@@ -35,6 +35,308 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 st.set_page_config(page_title="OTC Algo Dashboard", layout="wide")
 
 
+def inject_design() -> None:
+    st.markdown(
+        """
+        <style>
+        :root {
+            --otc-bg: #f5f5f7;
+            --otc-card: #ffffff;
+            --otc-text: #1d1d1f;
+            --otc-muted: #6e6e73;
+            --otc-line: #d2d2d7;
+            --otc-blue: #0071e3;
+            --otc-green: #1d9b58;
+            --otc-red: #c91f37;
+        }
+
+        .stApp {
+            background: var(--otc-bg);
+            color: var(--otc-text);
+        }
+
+        header[data-testid="stHeader"] {
+            background: rgba(245, 245, 247, 0.78);
+            backdrop-filter: blur(18px);
+        }
+
+        section[data-testid="stSidebar"] {
+            background: #fbfbfd;
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3 {
+            color: var(--otc-text);
+            font-weight: 650;
+            letter-spacing: 0;
+        }
+
+        .block-container {
+            padding-top: 2.25rem;
+            padding-bottom: 4rem;
+            max-width: 1220px;
+        }
+
+        h1, h2, h3 {
+            color: var(--otc-text);
+            letter-spacing: 0;
+        }
+
+        h1 {
+            font-size: 56px !important;
+            line-height: 1.04 !important;
+            font-weight: 700 !important;
+        }
+
+        h2 {
+            font-size: 32px !important;
+            line-height: 1.15 !important;
+            font-weight: 680 !important;
+        }
+
+        h3 {
+            font-size: 20px !important;
+            font-weight: 650 !important;
+        }
+
+        p, label, .stCaption, [data-testid="stMarkdownContainer"] {
+            color: var(--otc-muted);
+            letter-spacing: 0;
+        }
+
+        .otc-hero {
+            padding: 56px 24px 34px;
+            text-align: center;
+        }
+
+        .otc-eyebrow {
+            color: var(--otc-blue);
+            font-size: 17px;
+            line-height: 1.35;
+            font-weight: 650;
+            margin-bottom: 10px;
+        }
+
+        .otc-title {
+            color: var(--otc-text);
+            font-size: 64px;
+            line-height: 1.02;
+            font-weight: 720;
+            letter-spacing: 0;
+            margin: 0 auto 12px;
+            max-width: 920px;
+        }
+
+        .otc-subtitle {
+            color: var(--otc-muted);
+            font-size: 22px;
+            line-height: 1.32;
+            font-weight: 400;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .otc-section {
+            margin-top: 28px;
+            margin-bottom: 10px;
+        }
+
+        .otc-section h2 {
+            margin-bottom: 4px;
+        }
+
+        .otc-section p {
+            font-size: 17px;
+            line-height: 1.45;
+            margin-top: 0;
+        }
+
+        .otc-card {
+            background: var(--otc-card);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 18px;
+            padding: 22px 24px;
+            min-height: 124px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        .otc-card-title {
+            color: var(--otc-text);
+            font-size: 19px;
+            line-height: 1.25;
+            font-weight: 680;
+            margin-bottom: 8px;
+        }
+
+        .otc-card-body {
+            color: var(--otc-muted);
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .otc-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            background: #eef6ff;
+            color: #0057b8;
+            font-size: 13px;
+            font-weight: 650;
+            margin: 4px 6px 4px 0;
+        }
+
+        .otc-status.safe {
+            background: #ecf8f1;
+            color: var(--otc-green);
+        }
+
+        .otc-status.off {
+            background: #f2f2f4;
+            color: var(--otc-muted);
+        }
+
+        div[data-testid="stMetric"] {
+            background: var(--otc-card);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 18px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        div[data-testid="stMetricLabel"] p {
+            color: var(--otc-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        div[data-testid="stMetricValue"] {
+            color: var(--otc-text);
+            font-weight: 680;
+        }
+
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 999px;
+            padding: 6px;
+            width: fit-content;
+            margin-bottom: 22px;
+        }
+
+        .stTabs [data-baseweb="tab"] {
+            border-radius: 999px;
+            padding: 8px 16px;
+            color: var(--otc-muted);
+            font-weight: 600;
+        }
+
+        .stTabs [aria-selected="true"] {
+            background: var(--otc-text);
+            color: white;
+        }
+
+        .stButton > button {
+            border-radius: 999px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 0.62rem 1.1rem;
+            font-weight: 650;
+            background: white;
+            color: var(--otc-text);
+        }
+
+        .stButton > button[kind="primary"] {
+            background: var(--otc-blue);
+            color: white;
+            border-color: var(--otc-blue);
+        }
+
+        .stDataFrame, div[data-testid="stTable"] {
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        div[data-testid="stAlert"] {
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        input, textarea, div[data-baseweb="select"] > div {
+            border-radius: 12px !important;
+        }
+
+        hr {
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        @media (max-width: 760px) {
+            .otc-title {
+                font-size: 42px;
+            }
+            .otc-subtitle {
+                font-size: 18px;
+            }
+            .block-container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_hero(settings: dict) -> None:
+    st.markdown(
+        f"""
+        <section class="otc-hero">
+            <div class="otc-eyebrow">OTC Algo</div>
+            <div class="otc-title">Disciplined scanning for speculative markets.</div>
+            <div class="otc-subtitle">
+                Discover a universe, refresh IBKR data, scan candidates, and run liquidity-aware backtests.
+                Live trading stays disabled.
+            </div>
+            <div style="margin-top:22px;">
+                <span class="otc-status safe">Live trading disabled</span>
+                <span class="otc-status off">Paper orders disabled</span>
+                <span class="otc-status">Entry range ${settings['entry']['min_price']:.4f} to ${settings['entry']['max_price']:.4f}</span>
+            </div>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_section(title: str, body: str) -> None:
+    st.markdown(
+        f"""
+        <div class="otc-section">
+            <h2>{title}</h2>
+            <p>{body}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_card(title: str, body: str) -> None:
+    st.markdown(
+        f"""
+        <div class="otc-card">
+            <div class="otc-card-title">{title}</div>
+            <div class="otc-card-body">{body}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def load_frames() -> MarketFrames:
     return MarketFrames(
         prices=read_table("prices"),
@@ -78,7 +380,8 @@ def choose_universe(label: str, key_prefix: str, default_manual: str = "AAPL,MSF
 
 def settings_from_sidebar() -> dict:
     settings = load_settings()
-    st.sidebar.header("Controls")
+    st.sidebar.title("Strategy Controls")
+    st.sidebar.caption("Tune the scanner and backtest assumptions.")
 
     st.sidebar.subheader("Entry")
     settings["entry"]["min_price"] = st.sidebar.number_input(
@@ -196,7 +499,7 @@ def settings_from_sidebar() -> dict:
 
 
 def render_database_controls() -> None:
-    st.subheader("Database")
+    render_section("Database", "Initialize local storage or load the included demo dataset.")
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("Initialize database", use_container_width=True):
@@ -210,9 +513,38 @@ def render_database_controls() -> None:
         st.metric("Sample data loaded", "Yes" if database_has_data() else "No")
 
 
+def render_overview(settings: dict) -> None:
+    render_section(
+        "Control Center",
+        "Run the workflow from left to right: discover a universe, refresh data, scan candidates, then backtest the strategy.",
+    )
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Database", "Ready" if database_has_data() else "Empty")
+    with col2:
+        st.metric("Universes", len(saved_universe_names()))
+    with col3:
+        st.metric("Live trading", "Off")
+    with col4:
+        st.metric("Paper orders", "Off")
+
+    st.write("")
+    step1, step2, step3, step4 = st.columns(4)
+    with step1:
+        render_card("1. Discover", "Use IBKR scanner discovery or a saved CSV to build the universe.")
+    with step2:
+        render_card("2. Refresh", "Pull historical bars through TWS or Gateway in read-only mode.")
+    with step3:
+        render_card("3. Scan", "Apply price, liquidity, catalyst, spread, and risk filters.")
+    with step4:
+        render_card("4. Backtest", "Simulate next-day entries, partial fills, and risk exits.")
+
+    st.write("")
+    render_database_controls()
+
+
 def render_universe() -> None:
-    st.subheader("Universe Selection")
-    st.caption("Create a saved ticker universe once, then use it for IBKR fetching, scanning, and backtesting.")
+    render_section("Universe", "Save, review, or replace ticker universes used by IBKR fetching and strategy tests.")
 
     names = saved_universe_names()
     if names:
@@ -224,7 +556,7 @@ def render_universe() -> None:
         st.info("No universes saved yet. Create one below or load sample data.")
 
     st.divider()
-    st.write("Create or replace a universe")
+    st.markdown("### Create or Replace")
     universe_name = st.text_input("Universe name", value="my_scan_universe")
     tickers_text = st.text_area("Tickers", value="AAPL,MSFT,NVDA", help="Comma or newline separated.")
     uploaded = st.file_uploader("Or upload CSV with a ticker column", type=["csv"])
@@ -249,9 +581,9 @@ def render_universe() -> None:
 
 
 def render_live_data(settings: dict) -> None:
-    st.subheader("Live / Delayed Price Data")
-    st.caption(
-        "Fetches real OHLCV price history from Alpha Vantage. This does not include OTC metadata, catalysts, or Level 2 depth."
+    render_section(
+        "Alpha Vantage Fallback",
+        "Fetch real OHLCV price history when IBKR is not available. This does not include OTC metadata, catalysts, or Level 2 depth.",
     )
     api_key = st.text_input("Alpha Vantage API key", type="password")
     symbols_text = st.text_area(
@@ -293,8 +625,7 @@ def render_live_data(settings: dict) -> None:
 
 
 def render_ibkr_data(settings: dict) -> None:
-    st.subheader("IBKR TWS / Gateway Data")
-    st.caption("Data-only connection. This dashboard does not place live or paper orders.")
+    render_section("IBKR Data", "Connect through TWS or IB Gateway in read-only mode. This dashboard does not place orders.")
 
     col1, col2, col3 = st.columns(3)
     host = col1.text_input("Host", value="127.0.0.1")
@@ -320,7 +651,7 @@ def render_ibkr_data(settings: dict) -> None:
     discovery_tab, bars_tab, depth_tab = st.tabs(["Discover Universe", "Historical Bars", "Level 2 Snapshot"])
 
     with discovery_tab:
-        st.write("Use IBKR/TWS market scanners to discover a candidate universe automatically.")
+        st.markdown("### Discover Universe")
         st.caption(
             "Scanner coverage comes from TWS. For OTC/sub-penny names, start broad, save the results, then let the local scanner enforce price/liquidity rules."
         )
@@ -366,6 +697,7 @@ def render_ibkr_data(settings: dict) -> None:
                 st.warning("\n".join(errors))
 
     with bars_tab:
+        st.markdown("### Historical Bars")
         _, symbols = choose_universe("Universe to fetch historical bars for", "bars")
         if st.button("Fetch IBKR historical bars into database", type="primary"):
             if not symbols:
@@ -396,7 +728,8 @@ def render_ibkr_data(settings: dict) -> None:
                 st.warning("Some requests failed:\n\n" + "\n".join(errors))
 
     with depth_tab:
-        st.write("Request an IBKR market-depth snapshot with `reqMktDepth`.")
+        st.markdown("### Level 2 Snapshot")
+        st.caption("Request an IBKR market-depth snapshot with `reqMktDepth`.")
         depth_symbols = saved_universe_names()
         depth_universe = st.selectbox("Optional source universe", ["Manual ticker"] + depth_symbols, key="depth_universe")
         universe_symbols = get_universe_tickers(depth_universe, DB_PATH) if depth_universe != "Manual ticker" else []
@@ -432,7 +765,7 @@ def scanner_frame(settings: dict) -> pd.DataFrame:
 
 
 def render_scanner(settings: dict) -> None:
-    st.subheader("Scanner")
+    render_section("Scanner", "Rank the currently loaded database symbols using the strategy filters and scoring model.")
     try:
         scan = scanner_frame(settings)
     except Exception as exc:
@@ -456,8 +789,7 @@ def render_scanner(settings: dict) -> None:
 
 
 def render_backtest(settings: dict) -> None:
-    st.subheader("Backtest")
-    st.caption("Signals are generated after a daily close. Entries are simulated on the next available trading day. No live or paper orders are sent.")
+    render_section("Backtest", "Signals are generated after the close. Entries are simulated on the next available trading day.")
     st.info(
         "For IBKR price-only data, catalyst and OTC risk fields are neutral placeholders unless you load a richer dataset. "
         "For a price-only test, turn off 'Require catalyst for tradable candidates' in the Live Data tab or loosen the sidebar thresholds."
@@ -505,8 +837,7 @@ def render_backtest(settings: dict) -> None:
 
 
 def render_monitor(settings: dict) -> None:
-    st.subheader("15-Minute Monitor Simulation")
-    st.caption("Checks a sample open position against the latest scanner snapshot. It only recommends actions.")
+    render_section("Monitor", "Simulate a 15-minute risk check. The monitor only recommends actions.")
     try:
         scan = scanner_frame(settings)
     except Exception as exc:
@@ -531,24 +862,23 @@ def render_monitor(settings: dict) -> None:
 
 
 def main() -> None:
+    inject_design()
     settings = settings_from_sidebar()
-    st.title("OTC Algo Dashboard")
-    st.caption("Speculative OTC/sub-penny scanner, backtester, and risk monitor. Live trading is disabled.")
+    render_hero(settings)
 
-    safety_cols = st.columns(3)
-    safety_cols[0].metric("Live trading", "Disabled")
-    safety_cols[1].metric("Paper trading", "Disabled")
-    safety_cols[2].metric("Entry range", f"${settings['entry']['min_price']:.4f} - ${settings['entry']['max_price']:.4f}")
-
-    tab_db, tab_universe, tab_live, tab_ibkr, tab_scan, tab_backtest, tab_monitor = st.tabs(["Database", "Universe", "Live Data", "IBKR", "Scanner", "Backtest", "Monitor"])
-    with tab_db:
-        render_database_controls()
+    tab_overview, tab_universe, tab_data, tab_scan, tab_backtest, tab_monitor = st.tabs(
+        ["Overview", "Universe", "Data", "Scanner", "Backtest", "Monitor"]
+    )
+    with tab_overview:
+        render_overview(settings)
     with tab_universe:
         render_universe()
-    with tab_live:
-        render_live_data(settings)
-    with tab_ibkr:
-        render_ibkr_data(settings)
+    with tab_data:
+        ibkr_tab, fallback_tab = st.tabs(["IBKR", "Alpha Vantage"])
+        with ibkr_tab:
+            render_ibkr_data(settings)
+        with fallback_tab:
+            render_live_data(settings)
     with tab_scan:
         render_scanner(settings)
     with tab_backtest:
