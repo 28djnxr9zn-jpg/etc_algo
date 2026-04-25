@@ -234,57 +234,60 @@ def render_ibkr_data(settings: dict) -> None:
         "Paid market-data subscriptions control whether live quotes and Level 2 depth are returned."
     )
 
-    if st.button("Fetch IBKR historical bars into database", type="primary"):
-        if not symbols:
-            st.error("Add at least one ticker.")
-            return
-        with st.spinner("Connecting to TWS/Gateway and fetching bars..."):
-            prices, errors = fetch_historical_daily_prices(
-                symbols=symbols,
-                config=config,
-                exchange=exchange,
-                primary_exchange=primary_exchange or None,
-                currency=currency,
-                duration=duration,
-                market_data_type=market_data_type,
-                what_to_show=what_to_show,
-                use_rth=use_rth,
-            )
-        if not prices.empty:
-            init_db(DB_PATH)
-            replace_table_rows(prices, "prices", DB_PATH)
-            from data_providers.alpha_vantage import neutral_catalysts, neutral_metadata
+    bars_tab, depth_tab = st.tabs(["Historical Bars", "Level 2 Snapshot"])
 
-            replace_table_rows(neutral_metadata(sorted(prices["ticker"].unique())), "otc_metadata", DB_PATH)
-            replace_table_rows(neutral_catalysts(sorted(prices["ticker"].unique())), "catalysts", DB_PATH)
-            st.success(f"Loaded {len(prices)} IBKR bar rows for {prices['ticker'].nunique()} symbols.")
-            st.dataframe(prices.sort_values(["ticker", "date"], ascending=[True, False]).head(25), use_container_width=True, hide_index=True)
-        if errors:
-            st.warning("Some requests failed:\n\n" + "\n".join(errors))
+    with bars_tab:
+        if st.button("Fetch IBKR historical bars into database", type="primary"):
+            if not symbols:
+                st.error("Add at least one ticker.")
+                return
+            with st.spinner("Connecting to TWS/Gateway and fetching bars..."):
+                prices, errors = fetch_historical_daily_prices(
+                    symbols=symbols,
+                    config=config,
+                    exchange=exchange,
+                    primary_exchange=primary_exchange or None,
+                    currency=currency,
+                    duration=duration,
+                    market_data_type=market_data_type,
+                    what_to_show=what_to_show,
+                    use_rth=use_rth,
+                )
+            if not prices.empty:
+                init_db(DB_PATH)
+                replace_table_rows(prices, "prices", DB_PATH)
+                from data_providers.alpha_vantage import neutral_catalysts, neutral_metadata
 
-    st.divider()
-    st.write("Level 2 / market depth test")
-    depth_symbol = st.text_input("Depth test ticker", value=symbols[0] if symbols else "AAPL")
-    depth_rows = st.slider("Depth rows", min_value=1, max_value=10, value=5)
-    smart_depth = st.checkbox("Smart depth", value=False)
-    if st.button("Test IBKR Level 2 snapshot"):
-        with st.spinner("Requesting market depth..."):
-            snapshot, errors = fetch_level2_snapshot(
-                symbol=depth_symbol,
-                config=config,
-                settings=settings,
-                exchange=exchange,
-                primary_exchange=primary_exchange or None,
-                currency=currency,
-                rows=depth_rows,
-                smart_depth=smart_depth,
-                market_data_type=market_data_type,
-            )
-        if snapshot:
-            st.success("Received Level 2 snapshot.")
-            st.dataframe(pd.DataFrame([snapshot]), use_container_width=True, hide_index=True)
-        if errors:
-            st.warning("\n".join(errors))
+                replace_table_rows(neutral_metadata(sorted(prices["ticker"].unique())), "otc_metadata", DB_PATH)
+                replace_table_rows(neutral_catalysts(sorted(prices["ticker"].unique())), "catalysts", DB_PATH)
+                st.success(f"Loaded {len(prices)} IBKR bar rows for {prices['ticker'].nunique()} symbols.")
+                st.dataframe(prices.sort_values(["ticker", "date"], ascending=[True, False]).head(25), use_container_width=True, hide_index=True)
+            if errors:
+                st.warning("Some requests failed:\n\n" + "\n".join(errors))
+
+    with depth_tab:
+        st.write("Request an IBKR market-depth snapshot with `reqMktDepth`.")
+        depth_symbol = st.text_input("Depth test ticker", value=symbols[0] if symbols else "AAPL")
+        depth_rows = st.slider("Depth rows", min_value=1, max_value=10, value=5)
+        smart_depth = st.checkbox("Smart depth", value=False)
+        if st.button("Test IBKR Level 2 snapshot", type="primary"):
+            with st.spinner("Requesting market depth..."):
+                snapshot, errors = fetch_level2_snapshot(
+                    symbol=depth_symbol,
+                    config=config,
+                    settings=settings,
+                    exchange=exchange,
+                    primary_exchange=primary_exchange or None,
+                    currency=currency,
+                    rows=depth_rows,
+                    smart_depth=smart_depth,
+                    market_data_type=market_data_type,
+                )
+            if snapshot:
+                st.success("Received Level 2 snapshot.")
+                st.dataframe(pd.DataFrame([snapshot]), use_container_width=True, hide_index=True)
+            if errors:
+                st.warning("\n".join(errors))
 
 
 def scanner_frame(settings: dict) -> pd.DataFrame:
