@@ -72,7 +72,7 @@ streamlit run dashboard.py
 The dashboard is organized as a dark fintech-style research cockpit with sidebar navigation:
 
 - **Command Center**: system status and workflow overview
-- **Autopilot**: one-click discovery, data refresh, scan, and backtest
+- **Pipeline**: IBKR discovery, data refresh, scan, and backtest
 - **Data Hub**: IBKR and Alpha Vantage data tools
 - **Research**: scanner and backtest workbench
 - **Universe**: saved symbol sets
@@ -81,16 +81,16 @@ The dashboard is organized as a dark fintech-style research cockpit with sidebar
 
 The controls are local only and do not enable live or paper trading.
 
-## Autopilot
+## Pipeline
 
-The **Autopilot** tab runs the read-only research loop in one click:
+The **Pipeline** page runs the read-only research loop:
 
 1. Discover symbols from an IBKR/TWS scanner.
 2. Save them to a local universe.
 3. Fetch historical bars through IBKR.
 4. Run the local scanner and backtester.
 
-Autopilot does not place live or paper orders.
+The pipeline does not place live or paper orders.
 
 ## Pull Real Price Data
 

@@ -39,29 +39,29 @@ def inject_design() -> None:
         """
         <style>
         :root {
-            --bg: #070a0f;
-            --panel: #0d121a;
-            --panel-2: #111823;
-            --panel-3: #151e2a;
-            --text: #f5f7fb;
-            --muted: #98a4b3;
-            --line: rgba(255, 255, 255, 0.10);
-            --blue: #28d7ff;
-            --green: #39ff88;
-            --pink: #ff3d71;
-            --amber: #f7c948;
+            --bg: #050505;
+            --panel: #0b0b0b;
+            --panel-2: #111111;
+            --panel-3: #191919;
+            --text: #f3f0e8;
+            --muted: #aaa39a;
+            --line: rgba(243, 240, 232, 0.16);
+            --red: #e30613;
+            --cream: #f3f0e8;
+            --dark-red: #83000a;
+            --warm-gray: #aaa39a;
         }
 
         .stApp {
             background:
-                radial-gradient(circle at 16% -10%, rgba(40, 215, 255, 0.14), transparent 28%),
-                radial-gradient(circle at 88% 4%, rgba(57, 255, 136, 0.08), transparent 26%),
+                radial-gradient(circle at 16% -10%, rgba(227, 6, 19, 0.18), transparent 28%),
+                radial-gradient(circle at 88% 4%, rgba(243, 240, 232, 0.06), transparent 26%),
                 var(--bg);
             color: var(--text);
         }
 
         header[data-testid="stHeader"] {
-            background: rgba(7, 10, 15, 0.76);
+            background: rgba(5, 5, 5, 0.84);
             backdrop-filter: blur(16px);
         }
 
@@ -72,7 +72,7 @@ def inject_design() -> None:
         }
 
         section[data-testid="stSidebar"] {
-            background: #090d13;
+            background: #080808;
             border-right: 1px solid var(--line);
         }
 
@@ -92,8 +92,8 @@ def inject_design() -> None:
             padding: 0;
             background:
                 linear-gradient(100deg, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.40)),
-                linear-gradient(135deg, rgba(40, 215, 255, 0.16), rgba(57, 255, 136, 0.06) 38%, rgba(255, 61, 113, 0.10)),
-                rgba(13, 18, 26, 0.86);
+                linear-gradient(135deg, rgba(227, 6, 19, 0.28), rgba(243, 240, 232, 0.08) 38%, rgba(131, 0, 10, 0.24)),
+                rgba(8, 8, 8, 0.92);
             box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
             margin-bottom: 18px;
             overflow: hidden;
@@ -150,7 +150,7 @@ def inject_design() -> None:
         }
 
         .kicker {
-            color: var(--blue);
+            color: var(--red);
             font-size: 12px;
             font-weight: 800;
             letter-spacing: 0.15em;
@@ -188,9 +188,9 @@ def inject_design() -> None:
             font-weight: 700;
         }
 
-        .badge.green { color: var(--green); background: rgba(57, 255, 136, 0.10); }
-        .badge.blue { color: var(--blue); background: rgba(40, 215, 255, 0.10); }
-        .badge.pink { color: var(--pink); background: rgba(255, 61, 113, 0.10); }
+        .badge.green { color: var(--cream); background: rgba(243, 240, 232, 0.10); }
+        .badge.blue { color: var(--red); background: rgba(227, 6, 19, 0.14); }
+        .badge.pink { color: var(--dark-red); background: rgba(131, 0, 10, 0.24); }
 
         .section-head {
             margin: 8px 0 18px;
@@ -199,7 +199,7 @@ def inject_design() -> None:
         }
 
         .section-kicker {
-            color: var(--blue);
+            color: var(--red);
             font-size: 12px;
             font-weight: 800;
             letter-spacing: 0.14em;
@@ -223,7 +223,7 @@ def inject_design() -> None:
         }
 
         .panel {
-            background: rgba(17, 24, 35, 0.90);
+            background: rgba(15, 15, 15, 0.94);
             border: 1px solid var(--line);
             border-radius: 0;
             padding: 22px 22px 20px;
@@ -239,7 +239,7 @@ def inject_design() -> None:
             right: 0;
             bottom: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--blue), transparent);
+            background: linear-gradient(90deg, var(--red), transparent);
         }
 
         .panel-title {
@@ -276,7 +276,7 @@ def inject_design() -> None:
         }
 
         .step-num {
-            color: var(--green);
+            color: var(--cream);
             font-size: 12px;
             font-weight: 800;
             letter-spacing: 0.12em;
@@ -305,7 +305,7 @@ def inject_design() -> None:
         }
 
         .editorial-card {
-            background: rgba(17, 24, 35, 0.84);
+            background: rgba(15, 15, 15, 0.90);
             padding: 28px;
             min-height: 240px;
             border-right: 1px solid var(--line);
@@ -322,12 +322,12 @@ def inject_design() -> None:
             position: absolute;
             inset: auto -20% -50% 12%;
             height: 180px;
-            background: radial-gradient(circle, rgba(40, 215, 255, 0.20), transparent 60%);
+            background: radial-gradient(circle, rgba(227, 6, 19, 0.26), transparent 60%);
             pointer-events: none;
         }
 
         .editorial-kicker {
-            color: var(--green);
+            color: var(--cream);
             font-size: 11px;
             letter-spacing: 0.14em;
             font-weight: 820;
@@ -362,7 +362,7 @@ def inject_design() -> None:
         .module-card {
             min-height: 220px;
             padding: 24px;
-            background: rgba(13, 18, 26, 0.92);
+            background: rgba(10, 10, 10, 0.94);
             border-right: 1px solid var(--line);
             position: relative;
         }
@@ -372,7 +372,7 @@ def inject_design() -> None:
         }
 
         .module-index {
-            color: var(--blue);
+            color: var(--red);
             font-size: 12px;
             letter-spacing: 0.14em;
             font-weight: 850;
@@ -394,7 +394,7 @@ def inject_design() -> None:
         }
 
         div[data-testid="stMetric"] {
-            background: rgba(17, 24, 35, 0.92);
+            background: rgba(15, 15, 15, 0.94);
             border: 1px solid var(--line);
             border-radius: 16px;
             padding: 16px 18px;
@@ -414,16 +414,16 @@ def inject_design() -> None:
         .stButton > button {
             border-radius: 12px;
             border: 1px solid var(--line);
-            background: #111823;
+            background: #111111;
             color: var(--text);
             font-weight: 720;
             min-height: 42px;
         }
 
         .stButton > button[kind="primary"] {
-            color: #061014;
+            color: #ffffff;
             border-color: rgba(255,255,255,0.20);
-            background: linear-gradient(135deg, var(--blue), var(--green));
+            background: linear-gradient(135deg, var(--red), #ff3340);
         }
 
         div[role="radiogroup"] label {
@@ -450,7 +450,7 @@ def inject_design() -> None:
 
         .stTabs [aria-selected="true"] {
             color: var(--text);
-            background: rgba(40, 215, 255, 0.18);
+            background: rgba(227, 6, 19, 0.32);
         }
 
         .stDataFrame, div[data-testid="stTable"] {
@@ -513,21 +513,20 @@ def app_hero(settings: dict) -> None:
             <div class="site-nav">
                 <div class="brand">OTC Algo</div>
                 <div class="nav-items">
-                    <span>Autopilot</span>
+                    <span>Pipeline</span>
                     <span>Data</span>
-                    <span>Research</span>
+                    <span>Backtest</span>
                     <span>Risk</span>
                 </div>
             </div>
             <div class="hero-content">
-                <div class="kicker">Mission control</div>
-                <div class="app-title">Find the signal before the crowd.</div>
+                <div class="kicker">Internal dashboard</div>
+                <div class="app-title">OTC scanner and backtest console.</div>
                 <div class="app-subtitle">
-                    An autonomous research system for speculative OTC setups: discover symbols through IBKR,
-                    refresh market data, score candidates, and simulate execution without enabling orders.
+                    IBKR data ingestion, universe discovery, signal scoring, liquidity-aware backtests, and risk monitoring. Live order routing is disabled.
                 </div>
-                <span class="badge green">Live trading off</span>
-                <span class="badge pink">Paper orders off</span>
+                <span class="badge green">Live trading disabled</span>
+                <span class="badge pink">Paper orders disabled</span>
                 <span class="badge blue">Entry ${settings['entry']['min_price']:.4f} to ${settings['entry']['max_price']:.4f}</span>
             </div>
         </div>
@@ -540,10 +539,10 @@ def pipeline_strip() -> None:
     st.markdown(
         """
         <div class="pipeline">
-            <div class="step"><div class="step-num">01</div><div class="step-title">Discover</div><div class="step-copy">Use IBKR scanner results to create a universe automatically.</div></div>
-            <div class="step"><div class="step-num">02</div><div class="step-title">Refresh</div><div class="step-copy">Fetch historical bars from TWS or IB Gateway.</div></div>
-            <div class="step"><div class="step-num">03</div><div class="step-title">Score</div><div class="step-copy">Apply price, volume, liquidity, and risk filters.</div></div>
-            <div class="step"><div class="step-num">04</div><div class="step-title">Backtest</div><div class="step-copy">Simulate next-day entries, partial fills, and risk exits.</div></div>
+            <div class="step"><div class="step-num">01</div><div class="step-title">Universe</div><div class="step-copy">Use IBKR scanner output to create or update the active symbol set.</div></div>
+            <div class="step"><div class="step-num">02</div><div class="step-title">Market data</div><div class="step-copy">Fetch historical bars from TWS or IB Gateway in read-only mode.</div></div>
+            <div class="step"><div class="step-num">03</div><div class="step-title">Signals</div><div class="step-copy">Apply entry, volume, liquidity, metadata, and risk filters.</div></div>
+            <div class="step"><div class="step-num">04</div><div class="step-title">Backtest</div><div class="step-copy">Simulate next-day entries, partial fills, slippage, and risk exits.</div></div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -555,18 +554,17 @@ def editorial_modules() -> None:
         """
         <div class="editorial-grid">
             <div class="editorial-card">
-                <div class="editorial-kicker">Primary operation</div>
-                <div class="editorial-title">Autopilot runs the research loop end to end.</div>
+                <div class="editorial-kicker">Pipeline</div>
+                <div class="editorial-title">Run the data pipeline end to end.</div>
                 <div class="editorial-copy">
-                    Discovery, universe creation, bar refresh, scan, and backtest are chained into one read-only sequence.
-                    Manual tools remain available when you need to inspect or override a step.
+                    Universe discovery, historical bar refresh, signal scan, and backtest run as one read-only sequence. Manual tools remain available for debugging.
                 </div>
             </div>
             <div class="editorial-card">
-                <div class="editorial-kicker">Safety boundary</div>
-                <div class="editorial-title">Simulation first. Orders never leave the app.</div>
+                <div class="editorial-kicker">Execution boundary</div>
+                <div class="editorial-title">No order routing.</div>
                 <div class="editorial-copy">
-                    IBKR is used as a market-data bridge. Trading flags stay off while the strategy is tested and refined.
+                    IBKR is used for scanner and market-data requests only. Live and paper order flags remain disabled.
                 </div>
             </div>
         </div>
@@ -581,18 +579,18 @@ def module_grid() -> None:
         <div class="module-grid">
             <div class="module-card">
                 <div class="module-index">DISCOVERY</div>
-                <div class="module-title">Universe first.</div>
-                <div class="module-copy">Use IBKR scanner output to build a live candidate set instead of typing tickers by hand.</div>
+                <div class="module-title">Universe management</div>
+                <div class="module-copy">IBKR scanner output is saved as a local universe for repeatable scans and tests.</div>
             </div>
             <div class="module-card">
                 <div class="module-index">RESEARCH</div>
-                <div class="module-title">Filter hard.</div>
-                <div class="module-copy">The strategy ranks signals but still respects price, liquidity, exposure, and risk rules.</div>
+                <div class="module-title">Signal filters</div>
+                <div class="module-copy">Candidates are filtered by price range, volume breakout, dollar volume, metadata, spread, and guardrails.</div>
             </div>
             <div class="module-card">
                 <div class="module-index">EXECUTION MODEL</div>
-                <div class="module-title">Assume friction.</div>
-                <div class="module-copy">Backtests simulate limit entries, partial fills, slippage, and exit liquidity instead of fantasy fills.</div>
+                <div class="module-title">Execution assumptions</div>
+                <div class="module-copy">Backtests use limit-order assumptions, partial fills, slippage, and conservative exit liquidity.</div>
             </div>
         </div>
         """,
@@ -652,12 +650,12 @@ def choose_universe(label: str, key_prefix: str, default_manual: str = "AAPL,MSF
 def build_settings() -> tuple[str, dict]:
     settings = load_settings()
     st.sidebar.title("OTC Algo")
-    st.sidebar.caption("Research cockpit")
+    st.sidebar.caption("Internal tools")
     if "page_nav" not in st.session_state:
-        st.session_state["page_nav"] = "Command Center"
+        st.session_state["page_nav"] = "Overview"
     page = st.sidebar.radio(
         "Navigate",
-        ["Command Center", "Autopilot", "Data", "Research", "Universe", "Risk & Admin"],
+        ["Overview", "Pipeline", "Data", "Research", "Universe", "Ops"],
         key="page_nav",
     )
 
@@ -752,7 +750,7 @@ def run_autonomous_pipeline(
     )
     tickers = discovered["ticker"].dropna().astype(str).tolist() if not discovered.empty else []
     if tickers:
-        upsert_universe(universe_name, tickers, source=f"ibkr:{scan_code}:{location_code}", notes="Autopilot discovery", db_path=DB_PATH)
+        upsert_universe(universe_name, tickers, source=f"ibkr:{scan_code}:{location_code}", notes="Pipeline discovery", db_path=DB_PATH)
 
     prices = pd.DataFrame()
     fetch_errors: list[str] = []
@@ -845,21 +843,21 @@ def render_command_center(settings: dict) -> None:
     col4.metric("Universes", health["universes"])
 
     st.write("")
-    page_header("Primary Workflow", "Run the autonomous research loop.", "This is the clean path: IBKR discovery, bar refresh, scan, and backtest.")
+    page_header("Primary Workflow", "Run the data pipeline.", "Primary path: IBKR universe discovery, historical bar refresh, signal scan, and backtest.")
     pipeline_strip()
-    if st.button("Launch Autopilot", type="primary", use_container_width=True):
-        st.session_state["page_nav"] = "Autopilot"
+    if st.button("Run Pipeline", type="primary", use_container_width=True):
+        st.session_state["page_nav"] = "Pipeline"
         st.rerun()
     editorial_modules()
     module_grid()
 
 
 def render_autopilot(settings: dict) -> None:
-    page_header("Autopilot", "One-button research run.", "Use sensible defaults, then run discovery, data refresh, and backtest as a single mission.")
-    st.warning("Research-only mode. No live or paper orders are sent.")
+    page_header("Pipeline", "Pipeline run.", "Run universe discovery, historical data refresh, signal scan, and backtest with one action.")
+    st.warning("Read-only mode. No live or paper orders are sent.")
 
     config = ibkr_config("auto", default_client_id=17)
-    html_panel("Mission setup", "Configure the scan perimeter and data mode. Autopilot will save the discovered universe, refresh prices, and run the strategy test.")
+    html_panel("Pipeline parameters", "Configure scanner scope, data mode, and backtest input. The run saves a universe and refreshes price data before testing.")
     st.write("")
     with st.form("autopilot_form"):
         col1, col2, col3 = st.columns(3)
@@ -878,10 +876,10 @@ def render_autopilot(settings: dict) -> None:
         market_data_type = col9.selectbox("Data mode", ["Live", "Delayed", "Frozen", "Delayed frozen"], index=1)
         what_to_show = col10.selectbox("Bars", ["TRADES", "MIDPOINT", "BID", "ASK"], index=0)
         use_rth = st.checkbox("Regular trading hours only", value=False)
-        submitted = st.form_submit_button("Run Autopilot", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("Run Pipeline", type="primary", use_container_width=True)
 
     if submitted:
-        with st.spinner("Running autonomous research pipeline..."):
+        with st.spinner("Running data pipeline..."):
             st.session_state["last_pipeline"] = run_autonomous_pipeline(
                 settings=settings,
                 config=config,
@@ -903,7 +901,7 @@ def render_autopilot(settings: dict) -> None:
 
 
 def render_data(settings: dict) -> None:
-    page_header("Data", "Build and refresh the research database.", "IBKR is the primary source. Alpha Vantage is a fallback for simple OHLCV imports.")
+    page_header("Data", "Refresh market data and universes.", "IBKR is the primary data bridge. Alpha Vantage is available for basic OHLCV fallback.")
     mode = st.radio("Data tool", ["IBKR Discover", "IBKR Historical Bars", "Alpha Vantage", "Level 2 Test"], horizontal=True)
 
     if mode == "IBKR Discover":
@@ -1033,7 +1031,7 @@ def scanner_frame(settings: dict) -> pd.DataFrame:
 
 
 def render_research(settings: dict) -> None:
-    page_header("Research", "Inspect candidates and test strategy behavior.", "Scanner shows the current candidate slate. Backtest simulates the full historical strategy path.")
+    page_header("Research", "Scan current candidates and run historical tests.", "Scanner shows current signals. Backtest uses historical bars and the configured execution assumptions.")
     mode = st.radio("Research mode", ["Scanner", "Backtest"], horizontal=True)
     if mode == "Scanner":
         try:
@@ -1088,7 +1086,7 @@ def render_research(settings: dict) -> None:
 
 
 def render_universe() -> None:
-    page_header("Universe", "Saved symbol sets.", "Review scanner output or import a controlled list when you want deterministic research.")
+    page_header("Universe", "Saved universes.", "Review scanner output or import a controlled symbol list.")
     names = saved_universe_names()
     left, right = st.columns([0.9, 1.1])
     with left:
@@ -1122,7 +1120,7 @@ def render_universe() -> None:
 
 
 def render_risk_admin(settings: dict) -> None:
-    page_header("Risk & Admin", "Operational checks and local setup.", "Initialize the database, load demo data, and run the monitor simulation.")
+    page_header("Ops", "Local setup and risk checks.", "Initialize local storage, load sample data, and run the monitor simulation.")
     admin, monitor = st.columns([0.9, 1.1])
     with admin:
         st.subheader("Database")
@@ -1163,9 +1161,9 @@ def render_risk_admin(settings: dict) -> None:
 def main() -> None:
     inject_design()
     page, settings = build_settings()
-    if page == "Command Center":
+    if page == "Overview":
         render_command_center(settings)
-    elif page == "Autopilot":
+    elif page == "Pipeline":
         render_autopilot(settings)
     elif page == "Data":
         render_data(settings)
@@ -1173,7 +1171,7 @@ def main() -> None:
         render_research(settings)
     elif page == "Universe":
         render_universe()
-    elif page == "Risk & Admin":
+    elif page == "Ops":
         render_risk_admin(settings)
 
 
