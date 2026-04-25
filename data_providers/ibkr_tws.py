@@ -1,10 +1,19 @@
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
 from time import sleep
 
 import pandas as pd
+
+# Streamlit runs app code inside a ScriptRunner thread. ib_insync imports
+# eventkit, which expects that thread to already have an asyncio event loop.
+try:
+    asyncio.get_event_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
 from ib_insync import IB, Stock, util
 
 from monitoring.level2 import enrich_level2_snapshot
