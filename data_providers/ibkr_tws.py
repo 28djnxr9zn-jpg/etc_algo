@@ -65,7 +65,14 @@ def fetch_historical_daily_prices(
 ) -> tuple[pd.DataFrame, list[str]]:
     errors: list[str] = []
     frames: list[pd.DataFrame] = []
-    ib = connect_ibkr(config)
+    try:
+        ib = connect_ibkr(config)
+    except Exception as exc:
+        return pd.DataFrame(), [
+            f"Could not connect to IBKR at {config.host}:{config.port}. "
+            "Open TWS or IB Gateway, log in, enable API socket clients, and confirm the API port. "
+            f"Original error: {exc}"
+        ]
     try:
         ib.reqMarketDataType(MARKET_DATA_TYPES[market_data_type])
         for symbol in symbols:
@@ -112,7 +119,14 @@ def fetch_level2_snapshot(
     market_data_type: str,
 ) -> tuple[dict | None, list[str]]:
     errors: list[str] = []
-    ib = connect_ibkr(config)
+    try:
+        ib = connect_ibkr(config)
+    except Exception as exc:
+        return None, [
+            f"Could not connect to IBKR at {config.host}:{config.port}. "
+            "Open TWS or IB Gateway, log in, enable API socket clients, and confirm the API port. "
+            f"Original error: {exc}"
+        ]
     try:
         ib.reqMarketDataType(MARKET_DATA_TYPES[market_data_type])
         contract = make_stock_contract(symbol, exchange=exchange, currency=currency, primary_exchange=primary_exchange)
