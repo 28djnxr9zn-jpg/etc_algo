@@ -24,6 +24,7 @@ def test_backtest_trade_creation():
     prices = pd.DataFrame([
         {"ticker": "ALFA", "date": "2026-01-01", "open": 0.002, "high": 0.002, "low": 0.002, "close": 0.002, "volume": 1_000_000, "dollar_volume": 2000},
         {"ticker": "ALFA", "date": "2026-01-02", "open": 0.002, "high": 0.006, "low": 0.002, "close": 0.005, "volume": 6_000_000, "dollar_volume": 30000},
+        {"ticker": "ALFA", "date": "2026-01-03", "open": 0.005, "high": 0.008, "low": 0.004, "close": 0.007, "volume": 7_000_000, "dollar_volume": 49000},
     ])
     metadata = pd.DataFrame([{"ticker": "ALFA", "date": "2026-01-02", "otc_tier": "Pink Current", "caveat_emptor_flag": 0, "expert_market_flag": 0, "grey_market_flag": 0, "reverse_split_flag": 0, "dilution_flag": 0, "shell_risk_flag": 0, "promotion_risk_flag": 0}])
     catalysts = pd.DataFrame([{"ticker": "ALFA", "date": "2026-01-02", "news_flag": 1, "filing_flag": 1, "social_spike_flag": 1, "catalyst_text": "test", "catalyst_strength_score": 90}])

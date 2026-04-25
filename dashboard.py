@@ -5,7 +5,7 @@ import logging
 import pandas as pd
 import streamlit as st
 
-from backtests.backtest import run_backtest
+from backtests.backtest import run_backtest_detailed
 from data_providers.alpha_vantage import fetch_symbols, normalize_symbols
 from data_providers.ibkr_tws import IBKRConnectionConfig, fetch_historical_daily_prices, fetch_level2_snapshot
 from database.db import DB_PATH, get_connection, init_db, load_sample_data, load_settings, read_table, replace_table_rows
@@ -84,6 +84,11 @@ def settings_from_sidebar() -> dict:
         min_value=0,
         value=int(settings["tradable"]["min_current_dollar_volume"]),
         step=1_000,
+    )
+    settings["tradable"]["require_catalyst"] = st.sidebar.checkbox(
+        "Require catalyst",
+        value=bool(settings["tradable"]["require_catalyst"]),
+        help="Turn this off for IBKR price-only data because IBKR bars do not include news/catalyst fields.",
     )
     settings["execution"]["max_spread_pct"] = st.sidebar.slider(
         "Max spread %",
@@ -324,13 +329,19 @@ def render_scanner(settings: dict) -> None:
 
 def render_backtest(settings: dict) -> None:
     st.subheader("Backtest")
-    st.caption("Runs locally using the current sidebar controls. No live or paper orders are sent.")
+    st.caption("Signals are generated after a daily close. Entries are simulated on the next available trading day. No live or paper orders are sent.")
+    st.info(
+        "For IBKR price-only data, catalyst and OTC risk fields are neutral placeholders unless you load a richer dataset. "
+        "For a price-only test, turn off 'Require catalyst for tradable candidates' in the Live Data tab or loosen the sidebar thresholds."
+    )
     if st.button("Run backtest", type="primary"):
         try:
-            metrics, trades = run_backtest(load_frames(), settings)
+            result = run_backtest_detailed(load_frames(), settings)
         except Exception as exc:
             st.error(f"Backtest failed: {exc}")
             return
+        metrics = result["metrics"]
+        trades = result["trades"]
 
         metric_cols = st.columns(4)
         metric_cols[0].metric("Portfolio value", f"${metrics['portfolio_value']:,.2f}")
@@ -338,14 +349,31 @@ def render_backtest(settings: dict) -> None:
         metric_cols[2].metric("Trades", metrics["number_of_trades"])
         metric_cols[3].metric("Open positions", metrics["positions_still_open"])
 
-        st.write("Metrics")
-        st.dataframe(pd.DataFrame([metrics]), use_container_width=True, hide_index=True)
-
-        st.write("Trades")
-        if trades:
-            st.dataframe(pd.DataFrame(trades), use_container_width=True, hide_index=True)
-        else:
-            st.info("No trades were created.")
+        metrics_tab, equity_tab, trades_tab, candidates_tab, rejects_tab = st.tabs(
+            ["Metrics", "Equity Curve", "Trades", "Candidates", "Rejects"]
+        )
+        with metrics_tab:
+            st.dataframe(pd.DataFrame([metrics]), use_container_width=True, hide_index=True)
+        with equity_tab:
+            equity = pd.DataFrame(result["equity_curve"])
+            if not equity.empty:
+                st.line_chart(equity.set_index("date")["portfolio_value"])
+                st.dataframe(equity, use_container_width=True, hide_index=True)
+        with trades_tab:
+            if trades:
+                st.dataframe(pd.DataFrame(trades), use_container_width=True, hide_index=True)
+            else:
+                st.info("No trades were created. Check the Candidates and Rejects tabs to see which filter blocked entries.")
+        with candidates_tab:
+            candidates = pd.DataFrame(result["candidate_log"])
+            if not candidates.empty:
+                st.dataframe(candidates.sort_values(["date", "signal_score"], ascending=[False, False]), use_container_width=True, hide_index=True)
+        with rejects_tab:
+            rejects = pd.DataFrame(result["rejected_orders"])
+            if not rejects.empty:
+                st.dataframe(rejects, use_container_width=True, hide_index=True)
+            else:
+                st.info("No rejected entry orders.")
 
 
 def render_monitor(settings: dict) -> None:

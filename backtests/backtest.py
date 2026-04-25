@@ -22,7 +22,9 @@ class Backtester:
         self.cash = self.starting_cash
         self.positions: dict[str, dict] = {}
         self.trades: list[dict] = []
-        self.equity_curve: list[float] = [self.starting_cash]
+        self.equity_curve: list[dict] = []
+        self.candidate_log: list[dict] = []
+        self.rejected_orders: list[dict] = []
         self.partial_fills = 0
         self.liquidity_rejections = 0
 
@@ -40,7 +42,19 @@ class Backtester:
     def total_exposure(self) -> float:
         return sum(position["shares"] * position["avg_cost"] for position in self.positions.values())
 
-    def try_entry(self, row: pd.Series, date: str, new_positions_today: int) -> int:
+    def market_row_for_execution(self, ticker: str, date: str) -> pd.Series | None:
+        prices = self.frames.prices.copy()
+        prices["date"] = pd.to_datetime(prices["date"])
+        rows = prices[(prices["ticker"] == ticker) & (prices["date"] == pd.to_datetime(date))]
+        if rows.empty:
+            return None
+        row = rows.iloc[-1].copy()
+        # Signals are generated after the prior close; entries use next-day open.
+        row["close"] = row["open"]
+        row["dollar_volume"] = float(row["open"]) * float(row["volume"])
+        return row
+
+    def try_entry(self, signal_row: pd.Series, date: str, new_positions_today: int) -> int:
         ok, reason = portfolio_guardrails_ok(
             open_positions=len(self.positions),
             new_positions_today=new_positions_today,
@@ -49,14 +63,25 @@ class Backtester:
             settings=self.settings,
         )
         if not ok:
-            logger.info("Guardrail skipped %s: %s", row["ticker"], reason)
+            logger.info("Guardrail skipped %s: %s", signal_row["ticker"], reason)
+            self.rejected_orders.append({"date": date, "ticker": signal_row["ticker"], "reason": reason})
             return 0
 
-        score = calculate_signal_score(row, self.settings)
+        execution_row = self.market_row_for_execution(signal_row["ticker"], date)
+        if execution_row is None:
+            self.rejected_orders.append({"date": date, "ticker": signal_row["ticker"], "reason": "no next-day execution row"})
+            return 0
+
+        row = signal_row.copy()
+        for column in ["open", "high", "low", "close", "volume", "dollar_volume"]:
+            row[column] = execution_row[column]
+
+        score = calculate_signal_score(signal_row, self.settings)
         sizing = calculate_position_size(row, score, self.portfolio_value(date), self.settings)
         fill = simulate_entry_fill(row, sizing["shares"], float(row["close"]), self.settings)
         if fill["rejected"]:
             self.liquidity_rejections += 1
+            self.rejected_orders.append({"date": date, "ticker": row["ticker"], "reason": fill["reason"]})
             return 0
         if fill["partial_fill"]:
             self.partial_fills += 1
@@ -124,21 +149,52 @@ class Backtester:
             else:
                 position["shares"] = remaining
 
+    def record_equity(self, date: str) -> None:
+        value = self.portfolio_value(date)
+        self.equity_curve.append(
+            {
+                "date": date,
+                "portfolio_value": round(value, 2),
+                "cash": round(self.cash, 2),
+                "open_positions": len(self.positions),
+                "exposure": round(self.total_exposure(), 2),
+            }
+        )
+
     def run(self) -> dict:
         dates = sorted(pd.to_datetime(self.frames.prices["date"]).dt.strftime("%Y-%m-%d").unique())
+        pending_candidates = pd.DataFrame()
         for date in dates:
+            new_positions_today = 0
+            if not pending_candidates.empty:
+                for _, row in pending_candidates.iterrows():
+                    if row["ticker"] in self.positions:
+                        continue
+                    new_positions_today += self.try_entry(row, date, new_positions_today)
+
             scan = scan_universe(self.frames, self.settings, as_of_date=date)
             if scan.empty:
+                self.record_equity(date)
                 continue
             scan["signal_score"] = scan.apply(lambda row: calculate_signal_score(row, self.settings), axis=1)
             self.apply_daily_risk(scan, date)
             candidates = scan[scan["passed_tradable"]].sort_values("signal_score", ascending=False)
-            new_positions_today = 0
-            for _, row in candidates.iterrows():
-                if row["ticker"] in self.positions:
-                    continue
-                new_positions_today += self.try_entry(row, date, new_positions_today)
-            self.equity_curve.append(self.portfolio_value(date))
+            for _, row in scan.iterrows():
+                self.candidate_log.append(
+                    {
+                        "date": date,
+                        "ticker": row["ticker"],
+                        "close": row["close"],
+                        "volume": row["volume"],
+                        "avg_volume_20d": row.get("avg_volume_20d", 0),
+                        "passed_watchlist": row["passed_watchlist"],
+                        "passed_tradable": row["passed_tradable"],
+                        "signal_score": row["signal_score"],
+                        "reason": row["reason"],
+                    }
+                )
+            pending_candidates = candidates
+            self.record_equity(date)
         return calculate_metrics(self.starting_cash, self.cash, self.positions, self.trades, self.equity_curve, self.partial_fills, self.liquidity_rejections)
 
 
@@ -146,3 +202,16 @@ def run_backtest(frames: MarketFrames, settings: dict) -> tuple[dict, list[dict]
     backtester = Backtester(frames, settings)
     metrics = backtester.run()
     return metrics, backtester.trades
+
+
+def run_backtest_detailed(frames: MarketFrames, settings: dict) -> dict:
+    backtester = Backtester(frames, settings)
+    metrics = backtester.run()
+    return {
+        "metrics": metrics,
+        "trades": backtester.trades,
+        "equity_curve": backtester.equity_curve,
+        "candidate_log": backtester.candidate_log,
+        "rejected_orders": backtester.rejected_orders,
+        "open_positions": list(backtester.positions.values()),
+    }

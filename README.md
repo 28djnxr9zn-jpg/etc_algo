@@ -55,6 +55,14 @@ python main.py backtest
 
 The backtester loops through historical dates, ranks tradable candidates, simulates liquidity-aware limit-order fills, applies risk exits, and prints metrics.
 
+The dashboard backtest is stricter than the original demo flow:
+
+- Signals are generated after a daily close.
+- Entries are simulated on the next available trading day.
+- The equity curve marks open positions to market.
+- Candidate and rejection tables show why trades did or did not happen.
+- Price-only IBKR data uses neutral placeholder catalyst/risk fields unless you load richer OTC metadata.
+
 ## Run The Dashboard
 
 ```bash
