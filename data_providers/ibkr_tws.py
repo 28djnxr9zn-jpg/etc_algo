@@ -63,8 +63,10 @@ def fetch_historical_daily_prices(
     duration: str,
     market_data_type: str,
     what_to_show: str,
+    use_rth: bool,
 ) -> tuple[pd.DataFrame, list[str]]:
     errors: list[str] = []
+    api_errors: list[str] = []
     frames: list[pd.DataFrame] = []
     try:
         ib = connect_ibkr(config)
@@ -75,8 +77,14 @@ def fetch_historical_daily_prices(
             f"Original error: {exc}"
         ]
     try:
+        def on_error(req_id, error_code, error_string, contract):
+            symbol_text = getattr(contract, "symbol", "") if contract else ""
+            api_errors.append(f"IBKR API error {error_code} reqId={req_id} {symbol_text}: {error_string}")
+
+        ib.errorEvent += on_error
         ib.reqMarketDataType(MARKET_DATA_TYPES[market_data_type])
         for symbol in symbols:
+            before_error_count = len(api_errors)
             try:
                 contract = make_stock_contract(symbol, exchange=exchange, currency=currency, primary_exchange=primary_exchange)
                 qualified = ib.qualifyContracts(contract)
@@ -90,17 +98,19 @@ def fetch_historical_daily_prices(
                     durationStr=duration,
                     barSizeSetting="1 day",
                     whatToShow=what_to_show,
-                    useRTH=True,
+                    useRTH=use_rth,
                     formatDate=1,
                     keepUpToDate=False,
                 )
                 frame = util.df(bars)
                 if frame is None or frame.empty:
+                    symbol_errors = api_errors[before_error_count:]
+                    extra = " ".join(symbol_errors) if symbol_errors else "No IBKR API error event was emitted."
                     errors.append(
                         f"{symbol}: no historical bars returned for conId={contract.conId}, "
                         f"exchange={contract.exchange}, primaryExchange={getattr(contract, 'primaryExchange', '')}. "
                         f"whatToShow={what_to_show}. Check market-data permissions, try Delayed data, "
-                        "try MIDPOINT, or try a longer duration."
+                        f"try MIDPOINT, try useRTH off, or try a longer duration. {extra}"
                     )
                     continue
                 frame["ticker"] = symbol.upper()
@@ -111,6 +121,10 @@ def fetch_historical_daily_prices(
             except Exception as exc:
                 errors.append(f"{symbol}: {exc}")
     finally:
+        try:
+            ib.errorEvent -= on_error
+        except Exception:
+            pass
         ib.disconnect()
 
     prices = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
