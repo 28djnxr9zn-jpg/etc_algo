@@ -4,3 +4,4 @@ pyyaml
 pytest
 streamlit
 requests
+ib-insync

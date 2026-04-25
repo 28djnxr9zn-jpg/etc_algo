@@ -73,6 +73,26 @@ Important limitations:
 - Alpha Vantage free keys are rate-limited, so several tickers can take a minute.
 - True Level 2 order-book depth is not available from this price fetch. Future Level 2 should come from IBKR TWS/Gateway `reqMktDepth` or a dedicated market-data provider.
 
+## Pull IBKR Data
+
+The dashboard also has an **IBKR** tab for a data-only connection through Trader Workstation or IB Gateway.
+
+Before using it:
+
+1. Open Trader Workstation or IB Gateway.
+2. Log into paper trading while testing.
+3. Enable API socket clients in TWS/Gateway settings.
+4. Use port `7497` for TWS paper by default, or your configured API port.
+5. Subscribe to the needed market data in IBKR Client Portal.
+
+The IBKR tab can:
+
+- Fetch historical daily bars into the local database.
+- Test a Level 2 / market-depth snapshot with `reqMktDepth`.
+- Use live, frozen, delayed, or delayed-frozen market data modes.
+
+It cannot place orders. Order placement remains disabled.
+
 ## Run The 15-Minute Monitor Simulation
 
 ```bash

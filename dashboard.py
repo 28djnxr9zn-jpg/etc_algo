@@ -7,6 +7,7 @@ import streamlit as st
 
 from backtests.backtest import run_backtest
 from data_providers.alpha_vantage import fetch_symbols, normalize_symbols
+from data_providers.ibkr_tws import IBKRConnectionConfig, fetch_historical_daily_prices, fetch_level2_snapshot
 from database.db import DB_PATH, get_connection, init_db, load_sample_data, load_settings, read_table, replace_table_rows
 from monitoring.intraday_monitor import run_monitor_sim
 from scanners.universe import MarketFrames, scan_universe
@@ -207,6 +208,81 @@ def render_live_data(settings: dict) -> None:
             st.warning("Some symbols failed:\n\n" + "\n".join(result.errors))
 
 
+def render_ibkr_data(settings: dict) -> None:
+    st.subheader("IBKR TWS / Gateway Data")
+    st.caption("Data-only connection. This dashboard does not place live or paper orders.")
+
+    col1, col2, col3 = st.columns(3)
+    host = col1.text_input("Host", value="127.0.0.1")
+    port = col2.number_input("Port", min_value=1, max_value=65535, value=7497, help="7497 is common for TWS paper. 7496 is common for TWS live.")
+    client_id = col3.number_input("Client ID", min_value=1, max_value=9999, value=7)
+
+    col4, col5, col6 = st.columns(3)
+    exchange = col4.text_input("Exchange", value="SMART")
+    primary_exchange = col5.text_input("Primary exchange", value="", help="Optional. OTC/PINK symbols may need provider-specific mapping.")
+    currency = col6.text_input("Currency", value="USD")
+
+    symbols = normalize_symbols(st.text_area("Tickers", value="AAPL,MSFT"))
+    market_data_type = st.selectbox("Market data type", ["Live", "Delayed", "Frozen", "Delayed frozen"], index=1)
+    duration = st.selectbox("Historical duration", ["30 D", "60 D", "6 M", "1 Y"], index=1)
+    config = IBKRConnectionConfig(host=host, port=int(port), client_id=int(client_id), readonly=True)
+
+    st.info(
+        "Before using this: open TWS or IB Gateway, enable API socket clients, and log into paper if you are testing. "
+        "Paid market-data subscriptions control whether live quotes and Level 2 depth are returned."
+    )
+
+    if st.button("Fetch IBKR historical bars into database", type="primary"):
+        if not symbols:
+            st.error("Add at least one ticker.")
+            return
+        with st.spinner("Connecting to TWS/Gateway and fetching bars..."):
+            prices, errors = fetch_historical_daily_prices(
+                symbols=symbols,
+                config=config,
+                exchange=exchange,
+                primary_exchange=primary_exchange or None,
+                currency=currency,
+                duration=duration,
+                market_data_type=market_data_type,
+            )
+        if not prices.empty:
+            init_db(DB_PATH)
+            replace_table_rows(prices, "prices", DB_PATH)
+            from data_providers.alpha_vantage import neutral_catalysts, neutral_metadata
+
+            replace_table_rows(neutral_metadata(sorted(prices["ticker"].unique())), "otc_metadata", DB_PATH)
+            replace_table_rows(neutral_catalysts(sorted(prices["ticker"].unique())), "catalysts", DB_PATH)
+            st.success(f"Loaded {len(prices)} IBKR bar rows for {prices['ticker'].nunique()} symbols.")
+            st.dataframe(prices.sort_values(["ticker", "date"], ascending=[True, False]).head(25), use_container_width=True, hide_index=True)
+        if errors:
+            st.warning("Some requests failed:\n\n" + "\n".join(errors))
+
+    st.divider()
+    st.write("Level 2 / market depth test")
+    depth_symbol = st.text_input("Depth test ticker", value=symbols[0] if symbols else "AAPL")
+    depth_rows = st.slider("Depth rows", min_value=1, max_value=10, value=5)
+    smart_depth = st.checkbox("Smart depth", value=False)
+    if st.button("Test IBKR Level 2 snapshot"):
+        with st.spinner("Requesting market depth..."):
+            snapshot, errors = fetch_level2_snapshot(
+                symbol=depth_symbol,
+                config=config,
+                settings=settings,
+                exchange=exchange,
+                primary_exchange=primary_exchange or None,
+                currency=currency,
+                rows=depth_rows,
+                smart_depth=smart_depth,
+                market_data_type=market_data_type,
+            )
+        if snapshot:
+            st.success("Received Level 2 snapshot.")
+            st.dataframe(pd.DataFrame([snapshot]), use_container_width=True, hide_index=True)
+        if errors:
+            st.warning("\n".join(errors))
+
+
 def scanner_frame(settings: dict) -> pd.DataFrame:
     scan = scan_universe(load_frames(), settings)
     if scan.empty:
@@ -301,11 +377,13 @@ def main() -> None:
     safety_cols[1].metric("Paper trading", "Disabled")
     safety_cols[2].metric("Entry range", f"${settings['entry']['min_price']:.4f} - ${settings['entry']['max_price']:.4f}")
 
-    tab_db, tab_live, tab_scan, tab_backtest, tab_monitor = st.tabs(["Database", "Live Data", "Scanner", "Backtest", "Monitor"])
+    tab_db, tab_live, tab_ibkr, tab_scan, tab_backtest, tab_monitor = st.tabs(["Database", "Live Data", "IBKR", "Scanner", "Backtest", "Monitor"])
     with tab_db:
         render_database_controls()
     with tab_live:
         render_live_data(settings)
+    with tab_ibkr:
+        render_ibkr_data(settings)
     with tab_scan:
         render_scanner(settings)
     with tab_backtest:
