@@ -89,12 +89,64 @@ def inject_design() -> None:
         .app-shell {
             border: 1px solid var(--line);
             border-radius: 22px;
-            padding: 24px;
+            padding: 0;
             background:
-                linear-gradient(135deg, rgba(40, 215, 255, 0.10), rgba(57, 255, 136, 0.04) 38%, rgba(255, 61, 113, 0.06)),
+                linear-gradient(100deg, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.40)),
+                linear-gradient(135deg, rgba(40, 215, 255, 0.16), rgba(57, 255, 136, 0.06) 38%, rgba(255, 61, 113, 0.10)),
                 rgba(13, 18, 26, 0.86);
             box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
             margin-bottom: 18px;
+            overflow: hidden;
+            position: relative;
+            min-height: 560px;
+        }
+
+        .app-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 54px 54px;
+            mask-image: linear-gradient(90deg, rgba(0,0,0,0.7), transparent 78%);
+            pointer-events: none;
+        }
+
+        .site-nav {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(0,0,0,0.24);
+        }
+
+        .brand {
+            color: var(--text);
+            font-weight: 850;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 22px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            font-size: 11px;
+            font-weight: 760;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            padding: 88px 46px 44px;
+            max-width: 860px;
         }
 
         .kicker {
@@ -108,16 +160,17 @@ def inject_design() -> None:
 
         .app-title {
             color: var(--text);
-            font-size: 46px;
-            line-height: 1.02;
-            font-weight: 760;
-            max-width: 900px;
-            margin-bottom: 10px;
+            font-size: 76px;
+            line-height: 0.94;
+            font-weight: 860;
+            max-width: 860px;
+            margin-bottom: 18px;
+            letter-spacing: -0.02em;
         }
 
         .app-subtitle {
             color: var(--muted);
-            font-size: 17px;
+            font-size: 20px;
             line-height: 1.45;
             max-width: 780px;
         }
@@ -172,9 +225,21 @@ def inject_design() -> None:
         .panel {
             background: rgba(17, 24, 35, 0.90);
             border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 18px 18px 16px;
-            min-height: 118px;
+            border-radius: 0;
+            padding: 22px 22px 20px;
+            min-height: 142px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue), transparent);
         }
 
         .panel-title {
@@ -193,15 +258,21 @@ def inject_design() -> None:
         .pipeline {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            margin: 14px 0 20px;
+            gap: 0;
+            margin: 18px 0 24px;
+            border: 1px solid var(--line);
         }
 
         .step {
-            border: 1px solid var(--line);
+            border-right: 1px solid var(--line);
             background: rgba(255, 255, 255, 0.045);
-            border-radius: 14px;
-            padding: 14px;
+            border-radius: 0;
+            padding: 20px;
+            min-height: 150px;
+        }
+
+        .step:last-child {
+            border-right: none;
         }
 
         .step-num {
@@ -214,7 +285,7 @@ def inject_design() -> None:
 
         .step-title {
             color: var(--text);
-            font-size: 15px;
+            font-size: 18px;
             font-weight: 720;
             margin-bottom: 4px;
         }
@@ -223,6 +294,103 @@ def inject_design() -> None:
             color: var(--muted);
             font-size: 13px;
             line-height: 1.35;
+        }
+
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 0;
+            border: 1px solid var(--line);
+            margin-top: 18px;
+        }
+
+        .editorial-card {
+            background: rgba(17, 24, 35, 0.84);
+            padding: 28px;
+            min-height: 240px;
+            border-right: 1px solid var(--line);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .editorial-card:last-child {
+            border-right: 0;
+        }
+
+        .editorial-card::before {
+            content: "";
+            position: absolute;
+            inset: auto -20% -50% 12%;
+            height: 180px;
+            background: radial-gradient(circle, rgba(40, 215, 255, 0.20), transparent 60%);
+            pointer-events: none;
+        }
+
+        .editorial-kicker {
+            color: var(--green);
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            font-weight: 820;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .editorial-title {
+            color: var(--text);
+            font-size: 28px;
+            line-height: 1.08;
+            font-weight: 820;
+            max-width: 540px;
+            margin-bottom: 10px;
+        }
+
+        .editorial-copy {
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.45;
+            max-width: 560px;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0;
+            border: 1px solid var(--line);
+            margin-top: 20px;
+        }
+
+        .module-card {
+            min-height: 220px;
+            padding: 24px;
+            background: rgba(13, 18, 26, 0.92);
+            border-right: 1px solid var(--line);
+            position: relative;
+        }
+
+        .module-card:last-child {
+            border-right: 0;
+        }
+
+        .module-index {
+            color: var(--blue);
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            font-weight: 850;
+            margin-bottom: 42px;
+        }
+
+        .module-title {
+            color: var(--text);
+            font-size: 24px;
+            font-weight: 820;
+            line-height: 1.08;
+            margin-bottom: 8px;
+        }
+
+        .module-copy {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.42;
         }
 
         div[data-testid="stMetric"] {
@@ -304,7 +472,8 @@ def inject_design() -> None:
 
         @media (max-width: 880px) {
             .app-title { font-size: 34px; }
-            .pipeline { grid-template-columns: 1fr; }
+            .pipeline, .editorial-grid, .module-grid { grid-template-columns: 1fr; }
+            .step, .editorial-card, .module-card { border-right: none; border-bottom: 1px solid var(--line); }
         }
         </style>
         """,
@@ -341,15 +510,26 @@ def app_hero(settings: dict) -> None:
     st.markdown(
         f"""
         <div class="app-shell">
-            <div class="kicker">OTC Algo</div>
-            <div class="app-title">Autonomous OTC research, kept on a leash.</div>
-            <div class="app-subtitle">
-                Discover symbols through IBKR, refresh bars, scan for tradable setups,
-                and run a liquidity-aware backtest without enabling live orders.
+            <div class="site-nav">
+                <div class="brand">OTC Algo</div>
+                <div class="nav-items">
+                    <span>Autopilot</span>
+                    <span>Data</span>
+                    <span>Research</span>
+                    <span>Risk</span>
+                </div>
             </div>
-            <span class="badge green">Live trading off</span>
-            <span class="badge pink">Paper orders off</span>
-            <span class="badge blue">Entry ${settings['entry']['min_price']:.4f} to ${settings['entry']['max_price']:.4f}</span>
+            <div class="hero-content">
+                <div class="kicker">Mission control</div>
+                <div class="app-title">Find the signal before the crowd.</div>
+                <div class="app-subtitle">
+                    An autonomous research system for speculative OTC setups: discover symbols through IBKR,
+                    refresh market data, score candidates, and simulate execution without enabling orders.
+                </div>
+                <span class="badge green">Live trading off</span>
+                <span class="badge pink">Paper orders off</span>
+                <span class="badge blue">Entry ${settings['entry']['min_price']:.4f} to ${settings['entry']['max_price']:.4f}</span>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -364,6 +544,56 @@ def pipeline_strip() -> None:
             <div class="step"><div class="step-num">02</div><div class="step-title">Refresh</div><div class="step-copy">Fetch historical bars from TWS or IB Gateway.</div></div>
             <div class="step"><div class="step-num">03</div><div class="step-title">Score</div><div class="step-copy">Apply price, volume, liquidity, and risk filters.</div></div>
             <div class="step"><div class="step-num">04</div><div class="step-title">Backtest</div><div class="step-copy">Simulate next-day entries, partial fills, and risk exits.</div></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def editorial_modules() -> None:
+    st.markdown(
+        """
+        <div class="editorial-grid">
+            <div class="editorial-card">
+                <div class="editorial-kicker">Primary operation</div>
+                <div class="editorial-title">Autopilot runs the research loop end to end.</div>
+                <div class="editorial-copy">
+                    Discovery, universe creation, bar refresh, scan, and backtest are chained into one read-only sequence.
+                    Manual tools remain available when you need to inspect or override a step.
+                </div>
+            </div>
+            <div class="editorial-card">
+                <div class="editorial-kicker">Safety boundary</div>
+                <div class="editorial-title">Simulation first. Orders never leave the app.</div>
+                <div class="editorial-copy">
+                    IBKR is used as a market-data bridge. Trading flags stay off while the strategy is tested and refined.
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def module_grid() -> None:
+    st.markdown(
+        """
+        <div class="module-grid">
+            <div class="module-card">
+                <div class="module-index">DISCOVERY</div>
+                <div class="module-title">Universe first.</div>
+                <div class="module-copy">Use IBKR scanner output to build a live candidate set instead of typing tickers by hand.</div>
+            </div>
+            <div class="module-card">
+                <div class="module-index">RESEARCH</div>
+                <div class="module-title">Filter hard.</div>
+                <div class="module-copy">The strategy ranks signals but still respects price, liquidity, exposure, and risk rules.</div>
+            </div>
+            <div class="module-card">
+                <div class="module-index">EXECUTION MODEL</div>
+                <div class="module-title">Assume friction.</div>
+                <div class="module-copy">Backtests simulate limit entries, partial fills, slippage, and exit liquidity instead of fantasy fills.</div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -423,10 +653,12 @@ def build_settings() -> tuple[str, dict]:
     settings = load_settings()
     st.sidebar.title("OTC Algo")
     st.sidebar.caption("Research cockpit")
+    if "page_nav" not in st.session_state:
+        st.session_state["page_nav"] = "Command Center"
     page = st.sidebar.radio(
         "Navigate",
         ["Command Center", "Autopilot", "Data", "Research", "Universe", "Risk & Admin"],
-        index=0,
+        key="page_nav",
     )
 
     with st.sidebar.expander("Strategy Settings", expanded=False):
@@ -613,25 +845,22 @@ def render_command_center(settings: dict) -> None:
     col4.metric("Universes", health["universes"])
 
     st.write("")
-    left, right = st.columns([1.25, 0.75])
-    with left:
-        page_header("Primary Workflow", "Run the autonomous research loop.", "This is the clean path: IBKR discovery, bar refresh, scan, and backtest.")
-        pipeline_strip()
-        if st.button("Go to Autopilot", type="primary", use_container_width=True):
-            st.session_state["nav_hint"] = "Autopilot"
-            st.info("Use the sidebar to open Autopilot. Streamlit navigation state is manual for now.")
-    with right:
-        page_header("Guardrails", "Hard safety boundaries.", "The app can research and simulate, but it cannot place orders.")
-        html_panel("Trading disabled", "Live trading and paper order placement are both forced off in code.")
-        st.write("")
-        html_panel("IBKR is data-only", "TWS/Gateway is used for scanner and market data requests.")
+    page_header("Primary Workflow", "Run the autonomous research loop.", "This is the clean path: IBKR discovery, bar refresh, scan, and backtest.")
+    pipeline_strip()
+    if st.button("Launch Autopilot", type="primary", use_container_width=True):
+        st.session_state["page_nav"] = "Autopilot"
+        st.rerun()
+    editorial_modules()
+    module_grid()
 
 
 def render_autopilot(settings: dict) -> None:
-    page_header("Autopilot", "One-button research run.", "Use sensible defaults, then run discovery, data refresh, and backtest as a single pipeline.")
+    page_header("Autopilot", "One-button research run.", "Use sensible defaults, then run discovery, data refresh, and backtest as a single mission.")
     st.warning("Research-only mode. No live or paper orders are sent.")
 
     config = ibkr_config("auto", default_client_id=17)
+    html_panel("Mission setup", "Configure the scan perimeter and data mode. Autopilot will save the discovered universe, refresh prices, and run the strategy test.")
+    st.write("")
     with st.form("autopilot_form"):
         col1, col2, col3 = st.columns(3)
         scan_code = col1.selectbox("Scanner", ["HOT_BY_VOLUME", "TOP_PERC_GAIN", "MOST_ACTIVE", "TOP_TRADE_COUNT", "HOT_BY_PRICE"])
@@ -674,7 +903,7 @@ def render_autopilot(settings: dict) -> None:
 
 
 def render_data(settings: dict) -> None:
-    page_header("Data", "Build and refresh the research database.", "Use IBKR as the primary source. Alpha Vantage remains a fallback.")
+    page_header("Data", "Build and refresh the research database.", "IBKR is the primary source. Alpha Vantage is a fallback for simple OHLCV imports.")
     mode = st.radio("Data tool", ["IBKR Discover", "IBKR Historical Bars", "Alpha Vantage", "Level 2 Test"], horizontal=True)
 
     if mode == "IBKR Discover":
@@ -804,7 +1033,7 @@ def scanner_frame(settings: dict) -> pd.DataFrame:
 
 
 def render_research(settings: dict) -> None:
-    page_header("Research", "Inspect candidates and test strategy behavior.", "Use Scanner for current candidates and Backtest for historical simulation.")
+    page_header("Research", "Inspect candidates and test strategy behavior.", "Scanner shows the current candidate slate. Backtest simulates the full historical strategy path.")
     mode = st.radio("Research mode", ["Scanner", "Backtest"], horizontal=True)
     if mode == "Scanner":
         try:
