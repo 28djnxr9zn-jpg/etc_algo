@@ -49,6 +49,12 @@ def load_sample_data(db_path: Path | str = DB_PATH) -> None:
     logger.info("Loaded sample data into %s", db_path)
 
 
+def replace_table_rows(frame: pd.DataFrame, table: str, db_path: Path | str = DB_PATH) -> None:
+    with get_connection(db_path) as conn:
+        conn.execute(f"DELETE FROM {table}")
+        frame.to_sql(table, conn, if_exists="append", index=False)
+
+
 def read_table(table: str, db_path: Path | str = DB_PATH) -> pd.DataFrame:
     with get_connection(db_path) as conn:
         return pd.read_sql_query(f"SELECT * FROM {table}", conn)

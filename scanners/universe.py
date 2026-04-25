@@ -70,7 +70,11 @@ def build_daily_snapshot(frames: MarketFrames, as_of_date: str | None = None) ->
             catalysts = catalysts[catalysts["date"] <= pd.to_datetime(as_of_date)]
         catalysts = latest_rows_by_ticker(catalysts, "date").drop(columns=["date"], errors="ignore")
 
-    snapshot = latest_prices.merge(metadata, on="ticker", how="left").merge(catalysts, on="ticker", how="left")
+    snapshot = latest_prices
+    if not metadata.empty and "ticker" in metadata:
+        snapshot = snapshot.merge(metadata, on="ticker", how="left")
+    if not catalysts.empty and "ticker" in catalysts:
+        snapshot = snapshot.merge(catalysts, on="ticker", how="left")
 
     if frames.level2 is not None and not frames.level2.empty:
         level2 = frames.level2.copy()
@@ -83,7 +87,9 @@ def build_daily_snapshot(frames: MarketFrames, as_of_date: str | None = None) ->
     for column in RISK_FLAG_COLUMNS + ["news_flag", "filing_flag", "social_spike_flag"]:
         if column in snapshot:
             snapshot[column] = snapshot[column].fillna(0).astype(int)
-    snapshot["catalyst_strength_score"] = snapshot.get("catalyst_strength_score", 0).fillna(0)
+    if "catalyst_strength_score" not in snapshot:
+        snapshot["catalyst_strength_score"] = 0
+    snapshot["catalyst_strength_score"] = snapshot["catalyst_strength_score"].fillna(0)
     return snapshot
 
 

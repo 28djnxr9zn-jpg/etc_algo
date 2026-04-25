@@ -63,6 +63,16 @@ streamlit run dashboard.py
 
 The dashboard lets you initialize the database, load sample data, run the scanner, adjust key thresholds, run a backtest, inspect trades, and simulate the 15-minute monitor. The controls are local only and do not enable live or paper trading.
 
+## Pull Real Price Data
+
+The dashboard has a **Live Data** tab that can fetch real OHLCV price history from Alpha Vantage when you provide an API key. This replaces the local `prices`, `otc_metadata`, and `catalysts` tables with fetched price data plus neutral placeholder metadata/catalysts.
+
+Important limitations:
+
+- Price APIs do not automatically provide OTC caveat flags, dilution flags, promotion risk, or catalysts.
+- Alpha Vantage free keys are rate-limited, so several tickers can take a minute.
+- True Level 2 order-book depth is not available from this price fetch. Future Level 2 should come from IBKR TWS/Gateway `reqMktDepth` or a dedicated market-data provider.
+
 ## Run The 15-Minute Monitor Simulation
 
 ```bash

@@ -6,7 +6,8 @@ import pandas as pd
 import streamlit as st
 
 from backtests.backtest import run_backtest
-from database.db import DB_PATH, init_db, load_sample_data, load_settings, read_table
+from data_providers.alpha_vantage import fetch_symbols, normalize_symbols
+from database.db import DB_PATH, get_connection, init_db, load_sample_data, load_settings, read_table, replace_table_rows
 from monitoring.intraday_monitor import run_monitor_sim
 from scanners.universe import MarketFrames, scan_universe
 from strategies.scoring import calculate_signal_score
@@ -162,6 +163,50 @@ def render_database_controls() -> None:
         st.metric("Sample data loaded", "Yes" if database_has_data() else "No")
 
 
+def render_live_data(settings: dict) -> None:
+    st.subheader("Live / Delayed Price Data")
+    st.caption(
+        "Fetches real OHLCV price history from Alpha Vantage. This does not include OTC metadata, catalysts, or Level 2 depth."
+    )
+    api_key = st.text_input("Alpha Vantage API key", type="password")
+    symbols_text = st.text_area(
+        "Tickers",
+        value="AAPL,MSFT",
+        help="Use symbols supported by your data provider. OTC symbols may require provider-specific formats.",
+    )
+    outputsize = st.selectbox("History size", ["compact", "full"], index=0)
+    require_catalyst = st.checkbox(
+        "Require catalyst for tradable candidates",
+        value=bool(settings["tradable"]["require_catalyst"]),
+        help="Price providers usually do not include catalyst data, so turn this off to test price-only scans.",
+    )
+    settings["tradable"]["require_catalyst"] = require_catalyst
+
+    if st.button("Fetch and replace database prices", type="primary"):
+        symbols = normalize_symbols(symbols_text)
+        if not api_key:
+            st.error("Add an Alpha Vantage API key first.")
+            return
+        if not symbols:
+            st.error("Add at least one ticker.")
+            return
+        with st.spinner("Fetching data. Free API keys are rate-limited, so multiple tickers can take a minute."):
+            result = fetch_symbols(symbols, api_key, outputsize=outputsize)
+        if result.prices.empty:
+            st.error("No prices loaded.")
+        else:
+            init_db(DB_PATH)
+            replace_table_rows(result.prices, "prices", DB_PATH)
+            replace_table_rows(result.metadata, "otc_metadata", DB_PATH)
+            replace_table_rows(result.catalysts, "catalysts", DB_PATH)
+            with get_connection(DB_PATH) as conn:
+                conn.execute("DELETE FROM level2_snapshots")
+            st.success(f"Loaded {len(result.prices)} price rows for {result.prices['ticker'].nunique()} symbols.")
+            st.dataframe(result.prices.sort_values(["ticker", "date"], ascending=[True, False]).head(25), use_container_width=True)
+        if result.errors:
+            st.warning("Some symbols failed:\n\n" + "\n".join(result.errors))
+
+
 def scanner_frame(settings: dict) -> pd.DataFrame:
     scan = scan_universe(load_frames(), settings)
     if scan.empty:
@@ -256,9 +301,11 @@ def main() -> None:
     safety_cols[1].metric("Paper trading", "Disabled")
     safety_cols[2].metric("Entry range", f"${settings['entry']['min_price']:.4f} - ${settings['entry']['max_price']:.4f}")
 
-    tab_db, tab_scan, tab_backtest, tab_monitor = st.tabs(["Database", "Scanner", "Backtest", "Monitor"])
+    tab_db, tab_live, tab_scan, tab_backtest, tab_monitor = st.tabs(["Database", "Live Data", "Scanner", "Backtest", "Monitor"])
     with tab_db:
         render_database_controls()
+    with tab_live:
+        render_live_data(settings)
     with tab_scan:
         render_scanner(settings)
     with tab_backtest:
