@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from utils import safe_int
+
 
 def should_exit_for_price_above_entry_range(current_price: float, settings: dict) -> bool:
     return bool(settings["risk_exits"]["exit_on_price_above_entry_range"]) and current_price > settings["entry"]["max_price"]
@@ -37,10 +39,10 @@ def check_risk_exit(position: dict, observation: dict, settings: dict) -> tuple[
         if observation.get("bid_ask_spread_percent", 0) > settings["execution"]["max_spread_pct"]:
             return True, "extreme spread"
 
-    if settings["risk_exits"]["exit_on_dilution_flag"] and int(observation.get("dilution_flag", 0)):
+    if settings["risk_exits"]["exit_on_dilution_flag"] and safe_int(observation.get("dilution_flag", 0)):
         return True, "dilution flag appeared"
 
-    if settings["risk_exits"]["exit_on_reverse_split_flag"] and int(observation.get("reverse_split_flag", 0)):
+    if settings["risk_exits"]["exit_on_reverse_split_flag"] and safe_int(observation.get("reverse_split_flag", 0)):
         return True, "reverse split flag appeared"
 
     return False, "hold"

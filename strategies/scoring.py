@@ -2,15 +2,11 @@ from __future__ import annotations
 
 import pandas as pd
 
+from utils import safe_int
+
 
 def clamp(value: float, low: float = 0, high: float = 100) -> float:
     return max(low, min(high, value))
-
-
-def safe_int(value, default: int = 0) -> int:
-    if pd.isna(value):
-        return default
-    return int(value)
 
 
 def score_volume_breakout(row: pd.Series) -> float:

@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from utils import safe_float, safe_int
+
 
 RISK_FLAG_COLUMNS = [
     "expert_market_flag",
@@ -100,18 +102,18 @@ def passes_watchlist(row: pd.Series, settings: dict) -> tuple[bool, str]:
         return False, "20d average volume too low"
     if row["avg_dollar_volume_20d"] < settings["watchlist"]["min_avg_dollar_volume_20d"]:
         return False, "20d average dollar volume too low"
-    if int(row.get("expert_market_flag", 0)):
+    if safe_int(row.get("expert_market_flag", 0)):
         return False, "expert market excluded"
-    if int(row.get("grey_market_flag", 0)):
+    if safe_int(row.get("grey_market_flag", 0)):
         return False, "grey market excluded"
-    if int(row.get("caveat_emptor_flag", 0)):
+    if safe_int(row.get("caveat_emptor_flag", 0)):
         return False, "caveat emptor excluded"
     return True, "passed watchlist"
 
 
 def catalyst_is_active(row: pd.Series) -> bool:
     flags = [row.get("news_flag", 0), row.get("filing_flag", 0), row.get("social_spike_flag", 0)]
-    return any(int(flag) for flag in flags) or float(row.get("catalyst_strength_score", 0)) > 0
+    return any(safe_int(flag) for flag in flags) or safe_float(row.get("catalyst_strength_score", 0)) > 0
 
 
 def has_sufficient_level2(row: pd.Series, settings: dict) -> bool:
@@ -119,7 +121,7 @@ def has_sufficient_level2(row: pd.Series, settings: dict) -> bool:
         return True
     if float(row["bid_ask_spread_percent"]) > settings["execution"]["max_spread_pct"]:
         return False
-    return int(row.get("estimated_buy_fill_shares", 0)) > 0 and int(row.get("estimated_sell_fill_shares", 0)) > 0
+    return safe_int(row.get("estimated_buy_fill_shares", 0)) > 0 and safe_int(row.get("estimated_sell_fill_shares", 0)) > 0
 
 
 def passes_tradable(row: pd.Series, settings: dict) -> tuple[bool, str]:
@@ -132,9 +134,9 @@ def passes_tradable(row: pd.Series, settings: dict) -> tuple[bool, str]:
         return False, "current dollar volume too low"
     if settings["tradable"]["require_catalyst"] and not catalyst_is_active(row):
         return False, "missing catalyst"
-    if int(row.get("reverse_split_flag", 0)):
+    if safe_int(row.get("reverse_split_flag", 0)):
         return False, "reverse split flag"
-    if int(row.get("dilution_flag", 0)):
+    if safe_int(row.get("dilution_flag", 0)):
         return False, "dilution flag"
     if not has_sufficient_level2(row, settings):
         return False, "insufficient level 2 liquidity or wide spread"

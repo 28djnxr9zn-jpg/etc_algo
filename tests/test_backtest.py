@@ -32,3 +32,18 @@ def test_backtest_trade_creation():
     metrics, trades = run_backtest(MarketFrames(prices, metadata, catalysts, level2), cfg)
     assert metrics["number_of_trades"] >= 1
     assert trades[0]["ticker"] == "ALFA"
+
+
+def test_backtest_price_only_data_with_missing_flags_does_not_crash():
+    cfg = load_settings()
+    cfg["tradable"]["require_catalyst"] = False
+    prices = pd.DataFrame([
+        {"ticker": "PENY", "date": "2026-01-01", "open": 0.01, "high": 0.012, "low": 0.009, "close": 0.01, "volume": 1_000_000, "dollar_volume": 10_000},
+        {"ticker": "PENY", "date": "2026-01-02", "open": 0.01, "high": 0.02, "low": 0.01, "close": 0.02, "volume": 6_000_000, "dollar_volume": 120_000},
+        {"ticker": "PENY", "date": "2026-01-03", "open": 0.021, "high": 0.022, "low": 0.018, "close": 0.02, "volume": 5_000_000, "dollar_volume": 100_000},
+    ])
+    metadata = pd.DataFrame([{"ticker": "PENY", "date": "2026-01-02", "otc_tier": "Unknown"}])
+    catalysts = pd.DataFrame([{"ticker": "PENY", "date": "2026-01-02", "catalyst_text": "price-only"}])
+    metrics, trades = run_backtest(MarketFrames(prices, metadata, catalysts, pd.DataFrame()), cfg)
+    assert metrics["number_of_trades"] >= 0
+    assert isinstance(trades, list)
