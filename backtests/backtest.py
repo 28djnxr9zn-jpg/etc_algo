@@ -10,6 +10,7 @@ from monitoring.risk_checks import check_risk_exit, portfolio_guardrails_ok
 from scanners.universe import MarketFrames, scan_universe
 from strategies.scoring import calculate_signal_score
 from strategies.sizing import calculate_position_size
+from utils import safe_int
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ class Backtester:
             "shares": shares,
             "position_dollars": cost,
             "highest_price_since_entry": float(row["close"]),
-            "breakout_day_volume": int(row["volume"]),
+            "breakout_day_volume": safe_int(row["volume"]),
             "last_scan_price": float(row["close"]),
             "current_status": "open",
         }

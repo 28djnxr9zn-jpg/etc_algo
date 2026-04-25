@@ -19,6 +19,19 @@ def test_partial_fill_behavior():
     assert fill["partial_fill"]
 
 
+def test_fill_simulation_handles_nan_level2_fields():
+    cfg = load_settings()
+    row = pd.Series({
+        "best_ask": 0.01,
+        "bid_ask_spread_percent": 5,
+        "estimated_buy_fill_shares": float("nan"),
+        "volume": 100000,
+    })
+    fill = simulate_entry_fill(row, 5000, 0.01, cfg)
+    assert fill["filled_shares"] == 1000
+    assert fill["partial_fill"]
+
+
 def test_backtest_trade_creation():
     cfg = load_settings()
     prices = pd.DataFrame([

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import math
 
+from utils import safe_float, safe_int
+
 
 def spread_percent(best_bid: float, best_ask: float) -> float:
     if best_ask <= 0:
@@ -26,8 +28,8 @@ def estimate_executable_shares(displayed_depth: int, participation_rate_pct: flo
 def enrich_level2_snapshot(snapshot: dict, settings: dict) -> dict:
     bid = float(snapshot["best_bid"])
     ask = float(snapshot["best_ask"])
-    bid_depth = int(snapshot.get("bid_depth_shares", 0))
-    ask_depth = int(snapshot.get("ask_depth_shares", 0))
+    bid_depth = safe_int(snapshot.get("bid_depth_shares", 0))
+    ask_depth = safe_int(snapshot.get("ask_depth_shares", 0))
     participation = settings["execution"]["max_order_pct_of_displayed_liquidity"]
     return {
         **snapshot,

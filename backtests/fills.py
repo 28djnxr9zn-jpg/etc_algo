@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import math
 
+from utils import safe_float, safe_int
+
 
 def split_order(total_shares: int, slices: int = 4) -> list[int]:
     if total_shares <= 0:
@@ -25,9 +27,9 @@ def simulate_entry_fill(row, desired_shares: int, signal_price: float, settings:
     if best_ask > max_ask:
         return {"filled_shares": 0, "avg_fill_price": 0, "partial_fill": False, "rejected": True, "reason": "ask moved above chase limit"}
 
-    available = int(row.get("estimated_buy_fill_shares", 0))
+    available = safe_int(row.get("estimated_buy_fill_shares", 0))
     if available <= 0:
-        daily_cap = int((float(row.get("volume", 0)) * 0.01))
+        daily_cap = safe_int(safe_float(row.get("volume", 0)) * 0.01)
         available = max(0, daily_cap)
 
     filled = min(desired_shares, available)
@@ -47,7 +49,7 @@ def simulate_exit_fill(row, position_shares: int, settings: dict) -> dict:
     if position_shares <= 0:
         return {"filled_shares": 0, "avg_fill_price": 0, "partial_fill": False, "high_risk": False}
     best_bid = float(row.get("best_bid", row.get("close", 0)))
-    available = int(row.get("estimated_sell_fill_shares", 0))
+    available = safe_int(row.get("estimated_sell_fill_shares", 0))
     if available <= 0:
         available = math.floor(float(row.get("volume", 0)) * 0.005)
     filled = min(position_shares, max(0, available))
