@@ -1,0 +1,84 @@
+entry:
+  min_price: 0.0001
+  max_price: 0.05
+  price_range_applies_to_entries_only: true
+
+watchlist:
+  min_avg_volume_20d: 500000
+  min_avg_dollar_volume_20d: 500
+  max_days_since_last_trade: 5
+
+tradable:
+  min_volume_breakout_multiple: 3
+  preferred_volume_breakout_multiple: 5
+  min_current_dollar_volume: 10000
+  require_catalyst: true
+  exclude_expert_market: true
+  exclude_grey_market: true
+  exclude_caveat_emptor: true
+  exclude_reverse_split_flag: true
+  exclude_dilution_flag: true
+
+scoring:
+  volume_breakout_weight: 0.30
+  catalyst_weight: 0.25
+  otc_quality_weight: 0.15
+  risk_flags_weight: 0.15
+  momentum_weight: 0.15
+  full_position_score: 90
+  half_position_score: 75
+  starter_position_score: 60
+
+sizing:
+  max_single_position_pct: 0.05
+  max_position_pct_current_day_dollar_volume: 0.10
+  max_position_pct_avg_20d_dollar_volume: 0.20
+  fixed_dollar_cap_per_ticker: 1000
+  starter_position_pct_of_target: 0.25
+  allow_averaging_down: false
+
+execution:
+  order_type: limit
+  use_level2: true
+  max_spread_pct: 40
+  max_order_pct_of_displayed_liquidity: 10
+  max_chase_pct_above_signal_price: 10
+  allow_partial_fills: true
+  simulated_slippage_pct: 10
+
+monitoring:
+  enabled: true
+  interval_minutes: 15
+  market_hours_only: true
+
+risk_exits:
+  exit_on_price_above_entry_range: false
+  massive_drop_from_intraday_high_pct: 30
+  massive_drop_from_last_scan_pct: 40
+  exit_on_volume_collapse: true
+  volume_collapse_pct_of_breakout_volume: 50
+  exit_on_l2_bid_support_collapse: true
+  exit_on_extreme_spread: true
+  exit_on_dilution_flag: true
+  exit_on_reverse_split_flag: true
+
+profit_taking:
+  enabled: false
+  hold_winners_by_default: true
+  first_take_profit_pct_gain: 100
+  first_take_profit_sell_pct: 0.25
+  second_take_profit_pct_gain: 300
+  second_take_profit_sell_pct: 0.25
+  third_take_profit_pct_gain: 500
+  third_take_profit_sell_pct: 0.25
+
+portfolio:
+  starting_cash: 10000
+  max_total_otc_exposure_pct: 0.40
+  max_new_positions_per_day: 3
+  max_open_positions: 10
+  max_daily_loss_pct: 10
+  live_trading_enabled: false
+  paper_trading_enabled: false
+  global_stop_trading: false
+  flatten_all_positions: false

@@ -1,0 +1,6 @@
+ticker,date,otc_tier,caveat_emptor_flag,expert_market_flag,grey_market_flag,reverse_split_flag,dilution_flag,shell_risk_flag,promotion_risk_flag
+ALFA,2026-01-05,Pink Current,0,0,0,0,0,0,1
+BETA,2026-01-05,OTCQB,0,0,0,0,0,0,0
+CEYY,2026-01-05,Pink Limited,1,0,0,0,0,0,1
+MOON,2026-01-05,Pink Current,0,0,0,0,0,1,1
+WIDE,2026-01-05,Pink Current,0,0,0,0,0,0,0

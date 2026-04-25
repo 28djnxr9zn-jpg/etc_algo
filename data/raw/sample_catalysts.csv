@@ -1,0 +1,6 @@
+ticker,date,news_flag,filing_flag,social_spike_flag,catalyst_text,catalyst_strength_score
+ALFA,2026-01-05,1,1,1,New contract rumor plus filing,80
+BETA,2026-01-05,0,0,0,No fresh catalyst,0
+CEYY,2026-01-05,1,0,1,Promotional newsletter chatter,60
+MOON,2026-01-05,0,0,1,Social volume spike,45
+WIDE,2026-01-05,1,0,0,Product update,70
