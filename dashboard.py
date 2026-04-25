@@ -40,14 +40,17 @@ def inject_design() -> None:
         """
         <style>
         :root {
-            --otc-bg: #f5f5f7;
-            --otc-card: #ffffff;
-            --otc-text: #1d1d1f;
-            --otc-muted: #6e6e73;
-            --otc-line: #d2d2d7;
-            --otc-blue: #0071e3;
-            --otc-green: #1d9b58;
-            --otc-red: #c91f37;
+            --otc-bg: #080b10;
+            --otc-panel: #10151d;
+            --otc-card: #151b24;
+            --otc-card-2: #0d1118;
+            --otc-text: #f4f7fb;
+            --otc-muted: #9aa6b2;
+            --otc-line: rgba(255, 255, 255, 0.10);
+            --otc-blue: #2dd4ff;
+            --otc-green: #39ff88;
+            --otc-red: #ff3b6b;
+            --otc-amber: #ffcc33;
         }
 
         .stApp {
@@ -56,13 +59,13 @@ def inject_design() -> None:
         }
 
         header[data-testid="stHeader"] {
-            background: rgba(245, 245, 247, 0.78);
+            background: rgba(8, 11, 16, 0.78);
             backdrop-filter: blur(18px);
         }
 
         section[data-testid="stSidebar"] {
-            background: #fbfbfd;
-            border-right: 1px solid rgba(0, 0, 0, 0.08);
+            background: #0b0f16;
+            border-right: 1px solid var(--otc-line);
         }
 
         section[data-testid="stSidebar"] h1,
@@ -74,7 +77,7 @@ def inject_design() -> None:
         }
 
         .block-container {
-            padding-top: 2.25rem;
+            padding-top: 1.65rem;
             padding-bottom: 4rem;
             max-width: 1220px;
         }
@@ -107,35 +110,45 @@ def inject_design() -> None:
         }
 
         .otc-hero {
-            padding: 56px 24px 34px;
-            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 42px 34px 34px;
+            text-align: left;
+            background:
+                linear-gradient(135deg, rgba(45, 212, 255, 0.18), rgba(57, 255, 136, 0.08) 42%, rgba(255, 59, 107, 0.10)),
+                #0d1118;
+            border: 1px solid var(--otc-line);
+            border-radius: 24px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
         }
 
         .otc-eyebrow {
             color: var(--otc-blue);
-            font-size: 17px;
+            font-size: 13px;
             line-height: 1.35;
-            font-weight: 650;
+            font-weight: 760;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
             margin-bottom: 10px;
         }
 
         .otc-title {
             color: var(--otc-text);
-            font-size: 64px;
+            font-size: 56px;
             line-height: 1.02;
             font-weight: 720;
             letter-spacing: 0;
-            margin: 0 auto 12px;
-            max-width: 920px;
+            margin: 0 0 12px;
+            max-width: 820px;
         }
 
         .otc-subtitle {
             color: var(--otc-muted);
-            font-size: 22px;
+            font-size: 19px;
             line-height: 1.32;
             font-weight: 400;
-            max-width: 820px;
-            margin: 0 auto;
+            max-width: 760px;
+            margin: 0;
         }
 
         .otc-section {
@@ -155,11 +168,11 @@ def inject_design() -> None:
 
         .otc-card {
             background: var(--otc-card);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 18px;
+            border: 1px solid var(--otc-line);
+            border-radius: 14px;
             padding: 22px 24px;
             min-height: 124px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
         }
 
         .otc-card-title {
@@ -190,21 +203,26 @@ def inject_design() -> None:
         }
 
         .otc-status.safe {
-            background: #ecf8f1;
+            background: rgba(57, 255, 136, 0.12);
             color: var(--otc-green);
         }
 
         .otc-status.off {
-            background: #f2f2f4;
+            background: rgba(255, 255, 255, 0.09);
             color: var(--otc-muted);
+        }
+
+        .otc-status {
+            background: rgba(45, 212, 255, 0.12);
+            color: var(--otc-blue);
         }
 
         div[data-testid="stMetric"] {
             background: var(--otc-card);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 18px;
+            border: 1px solid var(--otc-line);
+            border-radius: 14px;
             padding: 18px 20px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
         }
 
         div[data-testid="stMetricLabel"] p {
@@ -220,58 +238,58 @@ def inject_design() -> None:
 
         .stTabs [data-baseweb="tab-list"] {
             gap: 8px;
-            background: rgba(255, 255, 255, 0.72);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--otc-line);
+            border-radius: 14px;
             padding: 6px;
             width: fit-content;
             margin-bottom: 22px;
         }
 
         .stTabs [data-baseweb="tab"] {
-            border-radius: 999px;
+            border-radius: 10px;
             padding: 8px 16px;
             color: var(--otc-muted);
             font-weight: 600;
         }
 
         .stTabs [aria-selected="true"] {
-            background: var(--otc-text);
-            color: white;
+            background: linear-gradient(135deg, rgba(45, 212, 255, 0.28), rgba(57, 255, 136, 0.18));
+            color: var(--otc-text);
         }
 
         .stButton > button {
-            border-radius: 999px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            border: 1px solid var(--otc-line);
             padding: 0.62rem 1.1rem;
             font-weight: 650;
-            background: white;
+            background: #111823;
             color: var(--otc-text);
         }
 
         .stButton > button[kind="primary"] {
-            background: var(--otc-blue);
-            color: white;
-            border-color: var(--otc-blue);
+            background: linear-gradient(135deg, var(--otc-blue), var(--otc-green));
+            color: #061014;
+            border-color: rgba(255, 255, 255, 0.18);
         }
 
         .stDataFrame, div[data-testid="stTable"] {
-            border-radius: 18px;
+            border-radius: 14px;
             overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--otc-line);
         }
 
         div[data-testid="stAlert"] {
-            border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 14px;
+            border: 1px solid var(--otc-line);
         }
 
         input, textarea, div[data-baseweb="select"] > div {
-            border-radius: 12px !important;
+            border-radius: 10px !important;
         }
 
         hr {
-            border-color: rgba(0, 0, 0, 0.08);
+            border-color: var(--otc-line);
         }
 
         @media (max-width: 760px) {
@@ -335,6 +353,81 @@ def render_card(title: str, body: str) -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def run_autonomous_pipeline(
+    settings: dict,
+    config: IBKRConnectionConfig,
+    scan_code: str,
+    location_code: str,
+    max_results: int,
+    min_price: float,
+    max_price: float,
+    min_volume: int,
+    universe_name: str,
+    duration: str,
+    market_data_type: str,
+    what_to_show: str,
+    use_rth: bool,
+) -> dict:
+    discovered, discovery_errors = discover_scanner_universe(
+        config=config,
+        scan_code=scan_code,
+        location_code=location_code,
+        max_results=max_results,
+        min_price=min_price if min_price > 0 else None,
+        max_price=max_price if max_price > 0 else None,
+        min_volume=min_volume if min_volume > 0 else None,
+        stock_type_filter="",
+    )
+    tickers = discovered["ticker"].dropna().astype(str).tolist() if not discovered.empty else []
+    if tickers:
+        upsert_universe(
+            universe_name,
+            tickers,
+            source=f"ibkr:{scan_code}:{location_code}",
+            notes="Autonomous pipeline discovery",
+            db_path=DB_PATH,
+        )
+
+    prices = pd.DataFrame()
+    fetch_errors: list[str] = []
+    if tickers:
+        prices, fetch_errors = fetch_historical_daily_prices(
+            symbols=tickers,
+            config=config,
+            exchange="SMART",
+            primary_exchange=None,
+            currency="USD",
+            duration=duration,
+            market_data_type=market_data_type,
+            what_to_show=what_to_show,
+            use_rth=use_rth,
+        )
+        if not prices.empty:
+            init_db(DB_PATH)
+            replace_table_rows(prices, "prices", DB_PATH)
+            from data_providers.alpha_vantage import neutral_catalysts, neutral_metadata
+
+            loaded_symbols = sorted(prices["ticker"].unique())
+            replace_table_rows(neutral_metadata(loaded_symbols), "otc_metadata", DB_PATH)
+            replace_table_rows(neutral_catalysts(loaded_symbols), "catalysts", DB_PATH)
+
+    backtest_result = None
+    if not prices.empty:
+        pipeline_settings = settings.copy()
+        pipeline_settings["tradable"] = settings["tradable"].copy()
+        pipeline_settings["tradable"]["require_catalyst"] = False
+        backtest_result = run_backtest_detailed(load_frames(), pipeline_settings)
+
+    return {
+        "discovered": discovered,
+        "discovery_errors": discovery_errors,
+        "prices": prices,
+        "fetch_errors": fetch_errors,
+        "backtest": backtest_result,
+        "universe_name": universe_name,
+    }
 
 
 def load_frames() -> MarketFrames:
@@ -541,6 +634,100 @@ def render_overview(settings: dict) -> None:
 
     st.write("")
     render_database_controls()
+
+
+def render_autopilot(settings: dict) -> None:
+    render_section(
+        "Autopilot",
+        "Run the full read-only research loop: discover a universe from IBKR, fetch bars, scan, and backtest. No orders are placed.",
+    )
+    st.warning("Autopilot is research-only. Live trading and paper order placement remain disabled.")
+
+    col1, col2, col3 = st.columns(3)
+    host = col1.text_input("IBKR host", value="127.0.0.1", key="auto_host")
+    port = col2.number_input("IBKR port", min_value=1, max_value=65535, value=7497, key="auto_port")
+    client_id = col3.number_input("Client ID", min_value=1, max_value=9999, value=17, key="auto_client")
+    config = IBKRConnectionConfig(host=host, port=int(port), client_id=int(client_id), readonly=True)
+
+    col4, col5, col6 = st.columns(3)
+    scan_code = col4.selectbox(
+        "Discovery scanner",
+        ["HOT_BY_VOLUME", "TOP_PERC_GAIN", "MOST_ACTIVE", "TOP_TRADE_COUNT", "HOT_BY_PRICE"],
+        index=0,
+        key="auto_scan",
+    )
+    location_code = col5.text_input("Scanner location", value="STK.US", key="auto_location")
+    max_results = col6.number_input("Max discovered symbols", min_value=1, max_value=200, value=50, step=10, key="auto_max_results")
+
+    col7, col8, col9 = st.columns(3)
+    min_price = col7.number_input("Discovery min price", min_value=0.0, value=float(settings["entry"]["min_price"]), step=0.0001, format="%.4f", key="auto_min_price")
+    max_price = col8.number_input("Discovery max price", min_value=0.0, value=float(settings["entry"]["max_price"]), step=0.01, format="%.4f", key="auto_max_price")
+    min_volume = col9.number_input("Discovery min volume", min_value=0, value=0, step=10000, key="auto_min_volume")
+
+    col10, col11, col12 = st.columns(3)
+    universe_name = col10.text_input("Universe name", value="autopilot_ibkr", key="auto_universe")
+    duration = col11.selectbox("History", ["30 D", "60 D", "6 M", "1 Y"], index=1, key="auto_duration")
+    market_data_type = col12.selectbox("Data mode", ["Live", "Delayed", "Frozen", "Delayed frozen"], index=1, key="auto_data_mode")
+
+    col13, col14 = st.columns(2)
+    what_to_show = col13.selectbox("Bar type", ["TRADES", "MIDPOINT", "BID", "ASK"], index=0, key="auto_bar_type")
+    use_rth = col14.checkbox("Regular hours only", value=False, key="auto_rth")
+
+    if st.button("Run Autopilot", type="primary", use_container_width=True):
+        with st.spinner("Running autonomous research pipeline..."):
+            result = run_autonomous_pipeline(
+                settings=settings,
+                config=config,
+                scan_code=scan_code,
+                location_code=location_code,
+                max_results=int(max_results),
+                min_price=float(min_price),
+                max_price=float(max_price),
+                min_volume=int(min_volume),
+                universe_name=universe_name,
+                duration=duration,
+                market_data_type=market_data_type,
+                what_to_show=what_to_show,
+                use_rth=use_rth,
+            )
+
+        discovered = result["discovered"]
+        prices = result["prices"]
+        backtest_result = result["backtest"]
+
+        scol1, scol2, scol3 = st.columns(3)
+        scol1.metric("Discovered", 0 if discovered.empty else discovered["ticker"].nunique())
+        scol2.metric("Price rows", len(prices))
+        scol3.metric("Trades", 0 if not backtest_result else backtest_result["metrics"]["number_of_trades"])
+
+        if result["discovery_errors"]:
+            st.warning("Discovery messages:\n\n" + "\n".join(result["discovery_errors"]))
+        if result["fetch_errors"]:
+            st.warning("Fetch messages:\n\n" + "\n".join(result["fetch_errors"]))
+
+        tabs = st.tabs(["Discovered", "Prices", "Backtest"])
+        with tabs[0]:
+            if not discovered.empty:
+                st.dataframe(discovered, use_container_width=True, hide_index=True)
+            else:
+                st.info("No symbols discovered.")
+        with tabs[1]:
+            if not prices.empty:
+                st.dataframe(prices.sort_values(["ticker", "date"], ascending=[True, False]).head(100), use_container_width=True, hide_index=True)
+            else:
+                st.info("No prices loaded.")
+        with tabs[2]:
+            if backtest_result:
+                metrics = backtest_result["metrics"]
+                st.dataframe(pd.DataFrame([metrics]), use_container_width=True, hide_index=True)
+                equity = pd.DataFrame(backtest_result["equity_curve"])
+                if not equity.empty:
+                    st.line_chart(equity.set_index("date")["portfolio_value"])
+                trades = pd.DataFrame(backtest_result["trades"])
+                if not trades.empty:
+                    st.dataframe(trades, use_container_width=True, hide_index=True)
+            else:
+                st.info("Backtest did not run because no price data was loaded.")
 
 
 def render_universe() -> None:
@@ -866,11 +1053,13 @@ def main() -> None:
     settings = settings_from_sidebar()
     render_hero(settings)
 
-    tab_overview, tab_universe, tab_data, tab_scan, tab_backtest, tab_monitor = st.tabs(
-        ["Overview", "Universe", "Data", "Scanner", "Backtest", "Monitor"]
+    tab_overview, tab_autopilot, tab_universe, tab_data, tab_scan, tab_backtest, tab_monitor = st.tabs(
+        ["Overview", "Autopilot", "Universe", "Data", "Scanner", "Backtest", "Monitor"]
     )
     with tab_overview:
         render_overview(settings)
+    with tab_autopilot:
+        render_autopilot(settings)
     with tab_universe:
         render_universe()
     with tab_data:

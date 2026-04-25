@@ -69,7 +69,18 @@ The dashboard backtest is stricter than the original demo flow:
 streamlit run dashboard.py
 ```
 
-The dashboard lets you initialize the database, load sample data, run the scanner, adjust key thresholds, run a backtest, inspect trades, and simulate the 15-minute monitor. The controls are local only and do not enable live or paper trading.
+The dashboard is organized as a dark fintech-style research cockpit. It lets you initialize the database, run an autonomous research pipeline, manage universes, fetch data, run the scanner, adjust key thresholds, run a backtest, inspect trades, and simulate the 15-minute monitor. The controls are local only and do not enable live or paper trading.
+
+## Autopilot
+
+The **Autopilot** tab runs the read-only research loop in one click:
+
+1. Discover symbols from an IBKR/TWS scanner.
+2. Save them to a local universe.
+3. Fetch historical bars through IBKR.
+4. Run the local scanner and backtester.
+
+Autopilot does not place live or paper orders.
 
 ## Pull Real Price Data
 
